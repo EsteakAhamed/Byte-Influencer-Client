@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 import RootLayout from "../layouts/RootLayout";
 import Home from "../pages/Home.jsx";
+import InfluencerList from "../pages/InfluencerList.jsx";
+import ClientList from '../pages/ClientList.jsx';
 
 export const router = createBrowserRouter([
     {
@@ -13,11 +15,11 @@ export const router = createBrowserRouter([
             },
             {
                 path: "influencers",
-                element: <div>Influencer List Page (Coming Soon)</div>,
+                element: <InfluencerList /> 
             },
             {
                 path: "clients",
-                element: <div>Client Management Page (Coming Soon)</div>,
+                element: <ClientList />
             },
         ],
     },
