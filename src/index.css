@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+
+@plugin "daisyui" {
+
+  themes: light;
+}
+
+/* Base styles for the project */
+@layer base {
+  body {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    @apply bg-white text-zinc-900 antialiased;
+  }
+}
+
+/* Custom Utility for Navigation */
+@layer components {
+  .nav-link-active {
+    @apply text-emerald-600 font-bold border-b-2 border-emerald-600 pb-1;
+  }
+}
