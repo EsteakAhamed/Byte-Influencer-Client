@@ -1,225 +1,324 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
-import { Search, Trash2, Edit3, Loader2, UserPlus, X } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import {
+    FiLoader,
+    FiInbox,
+    FiUsers,
+    FiTrendingUp,
+    FiHeart,
+    FiSearch,
+    FiPlus,
+    FiFilter
+} from 'react-icons/fi';
+
+import {
+    FaInstagram,
+    FaYoutube,
+    FaFacebook,
+    FaTiktok
+} from 'react-icons/fa';
+
+import InfluencerTable from '../components/influencers/InfluencerTable';
+import ImportInstagramModal from '../components/modals/ImportInstagramModal';
+import ImportYouTubeModal from '../components/modals/ImportYouTubeModal';
+import ImportFacebookModal from '../components/modals/ImportFacebookModal';
+import ImportTikTokModal from '../components/modals/ImportTikTokModal';
+import EditInfluencerModal from '../components/modals/EditInfluencerModal';
+import ConfirmDeleteModal from '../components/modals/ConfirmDeleteModal';
+
+import { fetchInfluencers, deleteInfluencer } from '../services/influencerService';
+
+
+// PLATFORM CONFIG
+const PLATFORMS = [
+    { id: 'all', label: 'All', icon: FiFilter },
+    { id: 'Instagram', label: 'Instagram', icon: FaInstagram },
+    { id: 'YouTube', label: 'YouTube', icon: FaYoutube },
+    { id: 'Facebook', label: 'Facebook', icon: FaFacebook },
+    { id: 'TikTok', label: 'TikTok', icon: FaTiktok }
+];
+
+
+// STAT CARD COMPONENT
+const StatCard = ({ icon: Icon, label, value, subtext }) => (
+    <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <div className="flex justify-between">
+            <div>
+                <p className="text-sm text-gray-500">{label}</p>
+                <p className="text-2xl font-bold">{value}</p>
+                {subtext && <p className="text-xs text-gray-400">{subtext}</p>}
+            </div>
+            <Icon className="w-5 h-5 text-gray-500" />
+        </div>
+    </div>
+);
+
 
 const InfluencerList = () => {
     const [creators, setCreators] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+
     const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    // NEW: Instagram URL state
-    const [igUrl, setIgUrl] = useState("");
-    const [importing, setImporting] = useState(false);
+    const [selectedPlatform, setSelectedPlatform] = useState('all');
+    const [showDropdown, setShowDropdown] = useState(false);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showIG, setShowIG] = useState(false);
+    const [showYT, setShowYT] = useState(false);
+    const [showFB, setShowFB] = useState(false);
+    const [showTT, setShowTT] = useState(false);
 
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const [editing, setEditing] = useState(null);
+    const [deleting, setDeleting] = useState(null);
 
-    // GET ALL DATA
-    const fetchCreators = async () => {
+
+    // LOAD DATA
+    const loadCreators = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/influencers`);
-            setCreators(response.data);
+            const data = await fetchInfluencers();
+            if (data) setCreators(data);
         } catch (err) {
-            setError("Database connection failed.");
+            toast.error(err.message || "Failed to load influencers");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchCreators();
+        loadCreators();
     }, []);
 
-    // IMPORT FROM INSTAGRAM
-    const handleSubmit = async (e) => {
-        e.preventDefault();
 
-        if (!igUrl.includes("instagram.com")) {
-            return alert("Please enter a valid Instagram URL");
+    // SEARCH DEBOUNCE
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+
+    // STATS
+    const stats = useMemo(() => {
+        const totalFollowers = creators.reduce(
+            (sum, c) => sum + (c.followers || 0),
+            0
+        );
+
+        const avgEngagement = creators.length
+            ? creators.reduce((sum, c) => sum + (c.metrics?.engagementRate || 0), 0) / creators.length
+            : 0;
+
+        const platformCount = new Set(
+            creators.flatMap(c => c.platforms || [])
+        ).size;
+
+        return {
+            total: creators.length,
+            followers:
+                totalFollowers >= 1000000
+                    ? `${(totalFollowers / 1000000).toFixed(1)}M`
+                    : `${(totalFollowers / 1000).toFixed(0)}K`,
+            engagement: avgEngagement.toFixed(1),
+            platforms: platformCount
+        };
+    }, [creators]);
+
+
+    // FILTER
+    const filtered = useMemo(() => {
+        let result = creators;
+
+        if (selectedPlatform !== 'all') {
+            result = result.filter(c =>
+                c.platforms?.includes(selectedPlatform)
+            );
         }
 
-        try {
-            setImporting(true);
+        if (debouncedSearch) {
+            const search = debouncedSearch.toLowerCase();
 
-            const res = await axios.post(
-                `${API_BASE_URL}/influencers/import-ig`,
-                { igUrl }
+            result = result.filter(c =>
+                c.name?.toLowerCase().includes(search) ||
+                c.handle?.toLowerCase().includes(search)
             );
+        }
 
-            console.log("Imported:", res.data);
+        return result;
+    }, [creators, debouncedSearch, selectedPlatform]);
 
-            setIsModalOpen(false);
-            setIgUrl("");
-            fetchCreators(); // refresh list
+
+    // DELETE
+    const handleDelete = async () => {
+        if (!deleting) return;
+
+        const id = deleting._id;
+        const prev = creators;
+
+        setCreators(prev.filter(c => c._id !== id));
+
+        try {
+            await deleteInfluencer(id);
+            toast.success("Deleted");
+            setDeleting(null);
         } catch (err) {
-            console.error(err);
-            alert("Failed to import influencer");
-        } finally {
-            setImporting(false);
+            setCreators(prev);
+            toast.error(err.message || "Delete failed");
+            setDeleting(null);
         }
     };
 
-    // SEARCH FILTER
-    const filteredCreators = useMemo(() => {
-        return creators.filter(c =>
-            c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.handle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.niche?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [searchTerm, creators]);
 
-    // LOADING SCREEN
-    if (loading) return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-zinc-400">
-            <Loader2 className="w-12 h-12 animate-spin text-emerald-500 mb-4" />
-            <p className="animate-pulse font-semibold">Syncing Network...</p>
-        </div>
-    );
+    // LOADING
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-[60vh]">
+                <FiLoader className="animate-spin w-10 h-10 text-gray-400" />
+            </div>
+        );
+    }
+
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-7xl mx-auto px-6 py-8">
 
             {/* HEADER */}
-            <header className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
-                <div>
-                    <h1 className="text-5xl font-black text-zinc-900 tracking-tight">Network</h1>
-                    <p className="text-zinc-500 font-medium text-lg mt-2">
-                        Managing {creators.length} global creators.
-                    </p>
-                </div>
-
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="btn bg-zinc-900 border-none rounded-2xl hover:bg-zinc-800 shadow-xl px-8 text-white h-14"
-                >
-                    <UserPlus className="w-5 h-5 mr-2" />
-                    Add Influencer
-                </button>
-            </header>
-
-            {/* SEARCH */}
-            <div className="flex mb-8">
-                <div className="relative w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
-                    <input
-                        type="text"
-                        placeholder="Search name, handle, or niche..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="input w-full pl-12 bg-white border-zinc-200 rounded-2xl shadow-sm"
-                    />
-                </div>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold">Creator Network</h1>
+                <p className="text-gray-500">Manage influencers</p>
             </div>
 
-            {/* TABLE */}
-            <div className="bg-white rounded-[40px] border border-zinc-100 shadow-2xl overflow-hidden">
-                <table className="table w-full">
-                    <thead className="bg-zinc-50/80">
-                        <tr>
-                            <th className="p-6 text-zinc-400 text-xs">Creator</th>
-                            <th className="p-6 text-zinc-400 text-xs">Niche</th>
-                            <th className="p-6 text-zinc-400 text-xs">Platform</th>
-                            <th className="p-6 text-zinc-400 text-xs">Followers</th>
-                            <th className="p-6 text-zinc-400 text-xs">Status</th>
-                            <th className="p-6 text-zinc-400 text-xs text-right">Actions</th>
-                        </tr>
-                    </thead>
 
-                    <tbody className="divide-y divide-zinc-50">
-                        {filteredCreators.map((creator) => (
-                            <tr key={creator._id} className="hover:bg-emerald-50/40 group">
-                                <td className="p-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-zinc-100 rounded-xl w-12 h-12 flex items-center justify-center font-bold text-xs">
-                                            {creator.name.substring(0, 2)}
-                                        </div>
-                                        <div>
-                                            <div className="font-bold">{creator.name}</div>
-                                            <div className="text-zinc-400 text-xs">{creator.handle}</div>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <td className="p-6 capitalize">
-                                    {creator.niche || 'General'}
-                                </td>
-
-                                <td className="p-6">
-                                    <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-xl text-sm">
-                                        {creator.platforms?.[0] || "Social"}
-                                    </span>
-                                </td>
-
-                                {/* ✅ FIXED FOLLOWERS */}
-                                <td className="p-6 font-bold">
-                                    {creator.followers}
-                                </td>
-
-                                <td className="p-6">
-                                    <span className={`px-2 py-1 text-xs rounded-lg ${creator.status === 'Active'
-                                            ? 'bg-emerald-500 text-white'
-                                            : 'bg-zinc-300'
-                                        }`}>
-                                        {creator.status}
-                                    </span>
-                                </td>
-
-                                <td className="p-6 text-right">
-                                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100">
-                                        <button className="text-zinc-400 hover:text-emerald-600">
-                                            <Edit3 className="w-4 h-4" />
-                                        </button>
-                                        <button className="text-zinc-400 hover:text-red-500">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            {/* STATS */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <StatCard icon={FiUsers} label="Creators" value={stats.total} />
+                <StatCard icon={FiTrendingUp} label="Reach" value={stats.followers} />
+                <StatCard icon={FiHeart} label="Engagement" value={`${stats.engagement}%`} />
+                <StatCard icon={FiFilter} label="Platforms" value={stats.platforms} />
             </div>
 
-            {/* MODAL */}
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-white w-full max-w-md rounded-3xl p-8 relative">
 
+            {/* FILTER + SEARCH */}
+            <div className="bg-white border rounded-xl p-4 mb-6 flex flex-col lg:flex-row gap-4">
+
+                {/* PLATFORM FILTER */}
+                <div className="flex flex-wrap gap-2">
+                    {PLATFORMS.map(p => {
+                        const Icon = p.icon;
+                        const active = selectedPlatform === p.id;
+
+                        return (
+                            <button
+                                key={p.id}
+                                onClick={() => setSelectedPlatform(p.id)}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${active
+                                        ? 'bg-black text-white'
+                                        : 'bg-gray-100'
+                                    }`}
+                            >
+                                <Icon className="w-4 h-4" />
+                                {p.label}
+                            </button>
+                        );
+                    })}
+                </div>
+
+
+                {/* SEARCH + ADD */}
+                <div className="flex gap-3 lg:ml-auto">
+
+                    <div className="relative">
+                        <FiSearch className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                        <input
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 pr-4 py-2 border rounded-lg"
+                            placeholder="Search..."
+                        />
+                    </div>
+
+                    <div className="relative">
                         <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="absolute top-4 right-4"
+                            onClick={() => setShowDropdown(!showDropdown)}
+                            className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm"
                         >
-                            <X />
+                            <FiPlus className="w-4 h-4" />
+                            Add Creator
                         </button>
 
-                        <h2 className="text-2xl font-bold mb-6">
-                            Import from Instagram
-                        </h2>
+                        {showDropdown && (
+                            <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                                <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                    Import from
+                                </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <input
-                                type="text"
-                                placeholder="https://www.instagram.com/username/"
-                                value={igUrl}
-                                onChange={(e) => setIgUrl(e.target.value)}
-                                className="input w-full border rounded-xl px-4 py-2"
-                                required
-                            />
+                                <button
+                                    onClick={() => { setShowIG(true); setShowDropdown(false); }}
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    <FaInstagram className="w-4 h-4 text-pink-500" />
+                                    Instagram
+                                </button>
 
-                            <button
-                                type="submit"
-                                disabled={importing}
-                                className="w-full bg-emerald-600 text-white py-3 rounded-xl"
-                            >
-                                {importing ? "Importing..." : "Import Influencer"}
-                            </button>
-                        </form>
+                                <button
+                                    onClick={() => { setShowYT(true); setShowDropdown(false); }}
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    <FaYoutube className="w-4 h-4 text-red-500" />
+                                    YouTube
+                                </button>
+
+                                <button
+                                    onClick={() => { setShowFB(true); setShowDropdown(false); }}
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    <FaFacebook className="w-4 h-4 text-blue-600" />
+                                    Facebook
+                                </button>
+
+                                <button
+                                    onClick={() => { setShowTT(true); setShowDropdown(false); }}
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    <FaTiktok className="w-4 h-4 text-black" />
+                                    TikTok
+                                </button>
+
+                            </div>
+                        )}
                     </div>
                 </div>
+            </div>
+
+
+            {/* TABLE */}
+            {filtered.length > 0 ? (
+                <InfluencerTable
+                    data={filtered}
+                    onDelete={(id) =>
+                        setDeleting(creators.find(c => c._id === id))
+                    }
+                    onEdit={setEditing}
+                />
+            ) : (
+                <div className="text-center py-20 text-gray-400">
+                    <FiInbox className="mx-auto mb-4 w-12 h-12" />
+                    No creators found
+                </div>
             )}
+
+
+            {/* MODALS */}
+            {showIG && <ImportInstagramModal onClose={() => setShowIG(false)} refresh={loadCreators} />}
+            {showYT && <ImportYouTubeModal onClose={() => setShowYT(false)} refresh={loadCreators} />}
+            {showFB && <ImportFacebookModal onClose={() => setShowFB(false)} refresh={loadCreators} />}
+            {showTT && <ImportTikTokModal onClose={() => setShowTT(false)} refresh={loadCreators} />}
+            {editing && <EditInfluencerModal data={editing} onClose={() => setEditing(null)} refresh={loadCreators} />}
+            {deleting && <ConfirmDeleteModal influencerName={deleting.name} onClose={() => setDeleting(null)} onConfirm={handleDelete} />}
         </div>
     );
 };
