@@ -12,7 +12,7 @@ const RootLayout = () => {
 
             <NavBar />
 
-            <main className="flex-grow px-6 lg:px-12 py-12">
+            <main className="flex-grow px-6 lg:px-12 pt-24 pb-12">
                 <Outlet />
             </main>
 
