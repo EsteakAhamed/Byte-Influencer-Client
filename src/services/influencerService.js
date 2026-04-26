@@ -18,6 +18,15 @@ export const fetchInfluencers = async () => {
     }
 };
 
+export const fetchInfluencerProfile = async (id) => {
+    try {
+        const res = await axios.get(`${API}/influencers/${id}/profile`);
+        return res.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};
+
 export const importInstagram = async (igUrl) => {
     try {
         const res = await axios.post(`${API}/influencers/import-ig`, { igUrl });
@@ -66,6 +75,17 @@ export const updateInfluencer = async (id, data) => {
 export const deleteInfluencer = async (id) => {
     try {
         const res = await axios.delete(`${API}/influencers/${id}`);
+        return res.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};
+
+export const deleteInfluencerPlatform = async (id, platformName, deleteIfEmpty = false) => {
+    try {
+        const res = await axios.delete(
+            `${API}/influencers/${id}/platform/${encodeURIComponent(platformName)}?deleteIfEmpty=${deleteIfEmpty}`
+        );
         return res.data;
     } catch (error) {
         handleAxiosError(error);

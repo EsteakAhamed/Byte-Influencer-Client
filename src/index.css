@@ -2,8 +2,7 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-
-  themes: light;
+  themes: light, dark;
 }
 
 /* Base styles for the project */
@@ -12,7 +11,7 @@
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
-    @apply bg-white text-zinc-900 antialiased;
+    @apply bg-base-100 text-base-content antialiased transition-colors duration-300;
   }
 }
 

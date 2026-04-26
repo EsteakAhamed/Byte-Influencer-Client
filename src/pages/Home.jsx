@@ -39,153 +39,145 @@ const Home = () => {
     const [platformsRef, platformsVisible] = useScrollAnimation(0.2);
 
     const stats = [
-        { label: 'Total Influencers', value: '1,284', change: '+12%', icon: FiUsers },
-        { label: 'Total Reach', value: '25.4M', change: '+8%', icon: FiTarget },
-        { label: 'Active Campaigns', value: '42', change: '+5', icon: FiTrendingUp },
+        { label: 'Total Influencers', value: '1,284', change: '+12%', trend: 'up', icon: FiUsers },
+        { label: 'Total Reach', value: '25.4M', change: '+8.2M', trend: 'up', icon: FiTarget },
+        { label: 'Active Campaigns', value: '42', change: '-2', trend: 'down', icon: FiTrendingUp },
     ];
 
     const features = [
-        { icon: FiZap, title: 'Real-time Analytics', desc: 'Track performance metrics as they happen with live dashboards.' },
-        { icon: FiGlobe, title: 'Multi-Platform', desc: 'Connect TikTok, Instagram, YouTube, and more in one place.' },
-        { icon: FiShield, title: 'Secure Data', desc: 'Enterprise-grade security for all your influencer data.' },
+        { 
+            icon: FiZap, 
+            title: 'Real-time Analytics', 
+            desc: 'Track performance metrics as they happen with live dashboards and instant updates.',
+            color: 'bg-amber-500'
+        },
+        { 
+            icon: FiGlobe, 
+            title: 'Multi-Platform', 
+            desc: 'Seamlessly connect TikTok, Instagram, YouTube, and more in one unified ecosystem.',
+            color: 'bg-blue-500'
+        },
+        { 
+            icon: FiShield, 
+            title: 'Enterprise Security', 
+            desc: 'Bank-grade security protocols to keep your influencer data and partnerships protected.',
+            color: 'bg-emerald-500'
+        },
     ];
 
-    const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Twitch'];
+    const platforms = ['Instagram', 'TikTok', 'YouTube', 'Facebook', 'Twitter', 'Twitch'];
 
     return (
-        <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-            {/* Hero Section with animated gradient */}
+        <div className="min-h-screen bg-base-100 overflow-x-hidden selection:bg-emerald-500/30">
+            {/* --- HERO SECTION --- */}
             <section 
                 ref={heroRef}
-                className="relative min-h-screen flex items-center overflow-hidden"
+                className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden"
             >
-                {/* Animated gradient background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-500/20 via-transparent to-transparent" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-teal-500/20 via-transparent to-transparent" />
+                {/* Modern background with mesh gradient */}
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute top-0 left-0 w-full h-full bg-base-100" />
+                    <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px]" />
+                    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
+                         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '48px 48px' }} 
+                    />
                 </div>
 
-                {/* Floating animated shapes */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-                    <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s' }} />
-                    <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s' }} />
-                </div>
-
-                {/* Grid pattern overlay */}
-                <div 
-                    className="absolute inset-0 opacity-[0.02]"
-                    style={{
-                        backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                        backgroundSize: '60px 60px'
-                    }}
-                />
-
-                <div className="relative max-w-7xl mx-auto px-4 lg:px-8 pt-32 pb-20">
-                    <div className="max-w-3xl">
-                        {/* Badge */}
+                <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
+                    <div className="max-w-4xl">
+                        {/* Animated Badge */}
                         <div 
-                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-sm text-emerald-400 mb-8 transition-all duration-700 ${
-                                heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold uppercase tracking-widest text-emerald-600 mb-8 transition-all duration-1000 ${
+                                heroVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                             }`}
                         >
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                            <span className="flex h-2 w-2 relative">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                             </span>
-                            Now supporting 6 major platforms
+                            v2.0 is now live
                         </div>
 
-                        {/* Main headline with staggered animation */}
-                        <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight mb-6">
-                            <span 
-                                className={`block transition-all duration-700 delay-100 ${
-                                    heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                                }`}
-                            >
-                                Build Your
+                        {/* Heading with bold weights */}
+                        <h1 className="text-6xl md:text-8xl font-black text-base-content leading-[0.9] tracking-tighter mb-8">
+                            <span className={`block transition-all duration-1000 delay-100 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+                                Influence
                             </span>
-                            <span 
-                                className={`block bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent transition-all duration-700 delay-200 ${
-                                    heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                                }`}
-                            >
-                                Influencer Empire
+                            <span className={`block text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-600 transition-all duration-1000 delay-300 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+                                Without Limits.
                             </span>
                         </h1>
 
-                        {/* Subtitle */}
-                        <p 
-                            className={`text-xl text-gray-400 max-w-xl mb-10 transition-all duration-700 delay-300 ${
-                                heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                            }`}
-                        >
-                            Unified analytics, smart campaign management, and powerful creator relationships — all in one beautiful dashboard.
+                        <p className={`text-xl md:text-2xl text-base-content/60 font-medium max-w-2xl mb-12 leading-relaxed transition-all duration-1000 delay-500 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+                            The next-generation platform to discover, track, and scale your creator partnerships with data-driven precision.
                         </p>
 
-                        {/* CTA Buttons */}
-                        <div 
-                            className={`flex flex-wrap gap-4 transition-all duration-700 delay-400 ${
-                                heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                            }`}
-                        >
+                        {/* Interactive Buttons */}
+                        <div className={`flex flex-wrap gap-5 transition-all duration-1000 delay-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
                             <Link
                                 to="/influencers"
-                                className="group px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl flex items-center gap-3 hover:bg-emerald-50 hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl shadow-emerald-500/20"
+                                className="group btn btn-lg bg-emerald-500 hover:bg-emerald-600 border-none text-white px-10 rounded-2xl shadow-xl shadow-emerald-500/20 transition-all duration-300 hover:scale-105 active:scale-95"
                             >
-                                Explore Network
-                                <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                                Get Started
+                                <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </Link>
                             <Link
                                 to="/clients"
-                                className="px-8 py-4 border border-white/20 hover:bg-white/10 text-white font-medium rounded-xl backdrop-blur-sm transition-all duration-300 hover:border-white/40"
+                                className="btn btn-lg btn-ghost border border-base-content/10 px-10 rounded-2xl backdrop-blur-md hover:bg-base-content/5 transition-all duration-300"
                             >
-                                View Clients
+                                Manage Clients
                             </Link>
                         </div>
-                    </div>
-                </div>
-
-                {/* Scroll indicator */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40">
-                    <span className="text-xs tracking-widest uppercase">Scroll</span>
-                    <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center pt-2">
-                        <div className="w-1 h-2 bg-white/40 rounded-full animate-bounce" />
                     </div>
                 </div>
             </section>
 
-            {/* Stats Section */}
+            {/* --- STATS SECTION --- */}
             <section 
                 ref={statsRef}
-                className="relative -mt-20 px-4 lg:px-8 z-10"
+                className="relative z-20 px-6 lg:px-8 pb-32"
             >
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {stats.map((stat, idx) => {
                             const Icon = stat.icon;
+                            const isUp = stat.trend === 'up';
                             return (
                                 <div
                                     key={idx}
-                                    className={`group bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 border border-gray-100 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-500 ${
-                                        statsVisible 
-                                            ? 'opacity-100 translate-y-0' 
-                                            : 'opacity-0 translate-y-12'
+                                    className={`group relative bg-base-100 rounded-[2.5rem] p-10 border border-base-content/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] hover:shadow-[0_32px_64px_-16px_rgba(16,185,129,0.15)] hover:-translate-y-4 transition-all duration-700 ${
+                                        statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
                                     }`}
-                                    style={{ transitionDelay: `${idx * 100}ms` }}
+                                    style={{ transitionDelay: `${idx * 150}ms` }}
                                 >
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="p-3 bg-gray-100 group-hover:bg-emerald-50 rounded-xl transition-colors duration-300">
-                                            <Icon className="w-6 h-6 text-gray-600 group-hover:text-emerald-600 transition-colors duration-300" />
+                                    <div className="flex justify-between items-start mb-12">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                            <div className="relative w-20 h-20 bg-base-200 dark:bg-white/5 rounded-3xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:rotate-6 shadow-inner">
+                                                <Icon className="w-8 h-8 text-base-content group-hover:text-white transition-colors duration-300" />
+                                            </div>
                                         </div>
-                                        <span className="text-emerald-600 text-sm font-semibold bg-emerald-50 px-2 py-1 rounded-lg">
-                                            {stat.change}
-                                        </span>
+                                        <div className={`flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-widest border ${
+                                            isUp 
+                                                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                                                : 'bg-red-500/10 text-red-600 border-red-500/20'
+                                        }`}>
+                                            {isUp ? '▲' : '▼'} {stat.change}
+                                        </div>
                                     </div>
-                                    <div className="text-4xl font-bold text-gray-900 mb-1 tracking-tight">
-                                        {stat.value}
+                                    
+                                    <div className="space-y-2">
+                                        <div className="text-7xl font-black text-base-content tracking-tighter leading-none">
+                                            {stat.value}
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-1 w-10 bg-emerald-500 rounded-full group-hover:w-16 transition-all duration-500" />
+                                            <div className="text-sm font-bold uppercase tracking-[0.3em] text-base-content/30 group-hover:text-base-content/60 transition-colors duration-300">
+                                                {stat.label}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p className="text-gray-500 font-medium">{stat.label}</p>
                                 </div>
                             );
                         })}
@@ -193,44 +185,42 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
+            {/* --- FEATURES SECTION --- */}
             <section 
                 ref={featuresRef}
-                className="py-24 px-4 lg:px-8"
+                className="py-32 px-6 lg:px-8 bg-base-200/50"
             >
                 <div className="max-w-7xl mx-auto">
                     <div 
-                        className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${
-                            featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                        className={`max-w-3xl mb-24 transition-all duration-1000 ${
+                            featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
                         }`}
                     >
-                        <span className="text-emerald-600 font-semibold text-sm tracking-wider uppercase mb-4 block">Features</span>
-                        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                            Everything you need to scale
+                        <h2 className="text-5xl md:text-6xl font-black text-base-content tracking-tighter mb-8">
+                            Engineered for <br/>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-blue-600">Performance.</span>
                         </h2>
-                        <p className="text-xl text-gray-500">
-                            Powerful tools designed for modern influencer marketing teams.
+                        <p className="text-xl text-base-content/60 leading-relaxed font-medium">
+                            Scale your influencer operations with tools built for speed, accuracy, and enterprise-grade reliability.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         {features.map((feature, idx) => {
                             const Icon = feature.icon;
                             return (
                                 <div
                                     key={idx}
-                                    className={`group p-8 rounded-2xl bg-white border border-gray-100 hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-500 ${
-                                        featuresVisible 
-                                            ? 'opacity-100 translate-y-0' 
-                                            : 'opacity-0 translate-y-12'
+                                    className={`group relative p-10 rounded-[2.5rem] bg-base-100 border border-base-content/5 hover:border-emerald-500/20 transition-all duration-700 ${
+                                        featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
                                     }`}
-                                    style={{ transitionDelay: `${(idx + 1) * 150}ms` }}
+                                    style={{ transitionDelay: `${idx * 200}ms` }}
                                 >
-                                    <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                                        <Icon className="w-7 h-7 text-emerald-600" />
+                                    <div className={`w-16 h-16 ${feature.color} text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-inherit/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500`}>
+                                        <Icon className="w-8 h-8" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                                    <p className="text-gray-500 leading-relaxed">{feature.desc}</p>
+                                    <h3 className="text-2xl font-bold text-base-content mb-4">{feature.title}</h3>
+                                    <p className="text-base-content/60 leading-relaxed font-medium">{feature.desc}</p>
                                 </div>
                             );
                         })}
@@ -238,58 +228,46 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Platforms Section */}
+            {/* --- CTA SECTION --- */}
             <section 
                 ref={platformsRef}
-                className="py-20 px-4 lg:px-8 bg-gray-900 relative overflow-hidden"
+                className="py-40 px-6 lg:px-8 relative"
             >
-                {/* Background effects */}
-                <div className="absolute inset-0">
-                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl" />
+                <div className="max-w-5xl mx-auto text-center relative z-10">
+                    <div 
+                        className={`transition-all duration-1000 ${
+                            platformsVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                        }`}
+                    >
+                        <h2 className="text-5xl md:text-7xl font-black text-base-content tracking-tighter mb-10 leading-[0.9]">
+                            Ready to transform your <br/>
+                            <span className="text-emerald-500 underline decoration-base-content/10 underline-offset-8 italic font-serif">network?</span>
+                        </h2>
+                        
+                        <div className="flex flex-wrap justify-center gap-4 mb-16">
+                            {platforms.map((p, idx) => (
+                                <div 
+                                    key={p} 
+                                    className="px-6 py-3 bg-base-200 text-base-content/40 rounded-2xl text-sm font-bold border border-base-content/5 hover:text-base-content transition-colors cursor-default"
+                                    style={{ transitionDelay: `${idx * 50}ms` }}
+                                >
+                                    {p}
+                                </div>
+                            ))}
+                        </div>
+
+                        <Link
+                            to="/influencers"
+                            className="btn btn-lg bg-base-content text-base-100 border-none px-12 rounded-3xl hover:bg-emerald-500 hover:text-white transition-all duration-500 shadow-2xl hover:scale-110 active:scale-95"
+                        >
+                            Explore Global Database
+                        </Link>
+                    </div>
                 </div>
 
-                <div className="relative max-w-7xl mx-auto text-center">
-                    <div 
-                        className={`transition-all duration-700 ${
-                            platformsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                        }`}
-                    >
-                        <span className="text-emerald-400 font-semibold text-sm tracking-wider uppercase mb-4 block">Integrations</span>
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                            Connect once. Track everything.
-                        </h2>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-12">
-                            Real-time data from all major platforms. No more switching between tabs.
-                        </p>
-                    </div>
-
-                    {/* Platform badges */}
-                    <div 
-                        className={`flex flex-wrap justify-center gap-4 mb-12 transition-all duration-700 delay-200 ${
-                            platformsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                        }`}
-                    >
-                        {platforms.map((platform, idx) => (
-                            <div
-                                key={platform}
-                                className="px-6 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white/80 font-medium hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-300"
-                                style={{ animationDelay: `${idx * 100}ms` }}
-                            >
-                                {platform}
-                            </div>
-                        ))}
-                    </div>
-
-                    <Link
-                        to="/influencers"
-                        className={`inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-400 transition-all duration-300 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 ${
-                            platformsVisible ? 'opacity-100' : 'opacity-0'
-                        }`}
-                    >
-                        Start Tracking
-                        <FiArrowRight />
-                    </Link>
+                {/* Decorative background for CTA */}
+                <div className="absolute inset-0 z-0 opacity-30 dark:opacity-10 pointer-events-none">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/20 rounded-full blur-[160px]" />
                 </div>
             </section>
         </div>

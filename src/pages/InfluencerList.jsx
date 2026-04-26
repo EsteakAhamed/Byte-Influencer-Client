@@ -25,9 +25,9 @@ import ImportYouTubeModal from '../components/modals/ImportYouTubeModal';
 import ImportFacebookModal from '../components/modals/ImportFacebookModal';
 import ImportTikTokModal from '../components/modals/ImportTikTokModal';
 import EditInfluencerModal from '../components/modals/EditInfluencerModal';
-import ConfirmDeleteModal from '../components/modals/ConfirmDeleteModal';
+import DeleteInfluencerModal from '../components/modals/DeleteInfluencerModal';
 
-import { fetchInfluencers, deleteInfluencer } from '../services/influencerService';
+import { fetchInfluencers, deleteInfluencer, deleteInfluencerPlatform } from '../services/influencerService';
 
 
 // PLATFORM CONFIG
@@ -42,14 +42,14 @@ const PLATFORMS = [
 
 // STAT CARD COMPONENT
 const StatCard = ({ icon: Icon, label, value, subtext }) => (
-    <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+    <div className="bg-base-100 rounded-xl p-5 border border-base-content/10 shadow-sm">
         <div className="flex justify-between">
             <div>
-                <p className="text-sm text-gray-500">{label}</p>
-                <p className="text-2xl font-bold">{value}</p>
-                {subtext && <p className="text-xs text-gray-400">{subtext}</p>}
+                <p className="text-sm text-base-content/60">{label}</p>
+                <p className="text-2xl font-bold text-base-content">{value}</p>
+                {subtext && <p className="text-xs text-base-content/40">{subtext}</p>}
             </div>
-            <Icon className="w-5 h-5 text-gray-500" />
+            <Icon className="w-5 h-5 text-base-content/60" />
         </div>
     </div>
 );
@@ -152,23 +152,58 @@ const InfluencerList = () => {
     }, [creators, debouncedSearch, selectedPlatform]);
 
 
-    // DELETE
-    const handleDelete = async () => {
-        if (!deleting) return;
+    // DELETE ENTIRE PROFILE — optimistic UI
+    const handleDeleteProfile = async (id) => {
+        const prev = [...creators];
+        const influencer = creators.find(c => c._id === id);
 
-        const id = deleting._id;
-        const prev = creators;
-
+        // Optimistic: remove from UI immediately
         setCreators(prev.filter(c => c._id !== id));
+        setDeleting(null);
 
         try {
             await deleteInfluencer(id);
-            toast.success("Deleted");
-            setDeleting(null);
+            toast.success(`${influencer?.name || 'Influencer'}'s profile deleted`);
         } catch (err) {
+            // Rollback on failure
             setCreators(prev);
             toast.error(err.message || "Delete failed");
-            setDeleting(null);
+        }
+    };
+
+    // DELETE SINGLE PLATFORM — optimistic UI
+    const handleDeletePlatform = async (id, platformName) => {
+        const prev = [...creators];
+        const influencer = creators.find(c => c._id === id);
+
+        // Optimistic: remove platform from local state
+        setCreators(creators.map(c => {
+            if (c._id !== id) return c;
+            const updatedPlatforms = c.platforms.filter(p => p !== platformName);
+            const { [platformName]: removed, ...remainingPlatformData } = c.platformData || {};
+            return {
+                ...c,
+                platforms: updatedPlatforms,
+                platformData: remainingPlatformData
+            };
+        }));
+        setDeleting(null);
+
+        try {
+            const result = await deleteInfluencerPlatform(id, platformName);
+            toast.success(`${platformName} removed from ${influencer?.name || 'influencer'}`);
+
+            // If the backend deleted the whole influencer (no platforms left), remove from list
+            if (result.deleted) {
+                setCreators(c => c.filter(item => item._id !== id));
+            } else {
+                // Refresh to get accurate aggregated data from backend
+                loadCreators();
+            }
+        } catch (err) {
+            // Rollback on failure
+            setCreators(prev);
+            toast.error(err.message || "Platform removal failed");
         }
     };
 
@@ -188,8 +223,8 @@ const InfluencerList = () => {
 
             {/* HEADER */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Creator Network</h1>
-                <p className="text-gray-500">Manage influencers</p>
+                <h1 className="text-3xl font-bold text-base-content">Creator Network</h1>
+                <p className="text-base-content/60">Manage influencers</p>
             </div>
 
 
@@ -203,7 +238,7 @@ const InfluencerList = () => {
 
 
             {/* FILTER + SEARCH */}
-            <div className="bg-white border rounded-xl p-4 mb-6 flex flex-col lg:flex-row gap-4">
+            <div className="bg-base-100 border border-base-content/10 rounded-xl p-4 mb-6 flex flex-col lg:flex-row gap-4">
 
                 {/* PLATFORM FILTER */}
                 <div className="flex flex-wrap gap-2">
@@ -215,9 +250,9 @@ const InfluencerList = () => {
                             <button
                                 key={p.id}
                                 onClick={() => setSelectedPlatform(p.id)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${active
-                                        ? 'bg-black text-white'
-                                        : 'bg-gray-100'
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${active
+                                        ? 'bg-base-content text-base-100'
+                                        : 'bg-base-200 text-base-content/70 hover:bg-base-300'
                                     }`}
                             >
                                 <Icon className="w-4 h-4" />
@@ -232,11 +267,11 @@ const InfluencerList = () => {
                 <div className="flex gap-3 lg:ml-auto">
 
                     <div className="relative">
-                        <FiSearch className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                        <FiSearch className="absolute left-3 top-2.5 w-4 h-4 text-base-content/40" />
                         <input
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 pr-4 py-2 border rounded-lg"
+                            className="pl-10 pr-4 py-2 bg-base-100 border border-base-content/20 rounded-lg focus:outline-none focus:border-emerald-500 text-base-content"
                             placeholder="Search..."
                         />
                     </div>
@@ -251,14 +286,14 @@ const InfluencerList = () => {
                         </button>
 
                         {showDropdown && (
-                            <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-                                <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            <div className="absolute right-0 top-full mt-2 w-52 bg-base-100 rounded-xl shadow-lg border border-base-content/10 py-2 z-50">
+                                <div className="px-3 py-2 text-xs font-semibold text-base-content/40 uppercase tracking-wider">
                                     Import from
                                 </div>
 
                                 <button
                                     onClick={() => { setShowIG(true); setShowDropdown(false); }}
-                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-base-content/80 hover:bg-base-200 transition-colors"
                                 >
                                     <FaInstagram className="w-4 h-4 text-pink-500" />
                                     Instagram
@@ -266,7 +301,7 @@ const InfluencerList = () => {
 
                                 <button
                                     onClick={() => { setShowYT(true); setShowDropdown(false); }}
-                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-base-content/80 hover:bg-base-200 transition-colors"
                                 >
                                     <FaYoutube className="w-4 h-4 text-red-500" />
                                     YouTube
@@ -274,7 +309,7 @@ const InfluencerList = () => {
 
                                 <button
                                     onClick={() => { setShowFB(true); setShowDropdown(false); }}
-                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-base-content/80 hover:bg-base-200 transition-colors"
                                 >
                                     <FaFacebook className="w-4 h-4 text-blue-600" />
                                     Facebook
@@ -282,9 +317,9 @@ const InfluencerList = () => {
 
                                 <button
                                     onClick={() => { setShowTT(true); setShowDropdown(false); }}
-                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-base-content/80 hover:bg-base-200 transition-colors"
                                 >
-                                    <FaTiktok className="w-4 h-4 text-black" />
+                                    <FaTiktok className="w-4 h-4 text-base-content" />
                                     TikTok
                                 </button>
 
@@ -318,7 +353,14 @@ const InfluencerList = () => {
             {showFB && <ImportFacebookModal onClose={() => setShowFB(false)} refresh={loadCreators} />}
             {showTT && <ImportTikTokModal onClose={() => setShowTT(false)} refresh={loadCreators} />}
             {editing && <EditInfluencerModal data={editing} onClose={() => setEditing(null)} refresh={loadCreators} />}
-            {deleting && <ConfirmDeleteModal influencerName={deleting.name} onClose={() => setDeleting(null)} onConfirm={handleDelete} />}
+            {deleting && (
+                <DeleteInfluencerModal
+                    influencer={deleting}
+                    onClose={() => setDeleting(null)}
+                    onDeleteProfile={handleDeleteProfile}
+                    onDeletePlatform={handleDeletePlatform}
+                />
+            )}
         </div>
     );
 };
