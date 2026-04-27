@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { FiX } from 'react-icons/fi';
 
 const BaseModal = ({
     onClose,
@@ -25,38 +25,52 @@ const BaseModal = ({
         }
     };
 
+    // Prevent background scrolling
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 
+                       bg-black/70 backdrop-blur-sm"
             onClick={handleOutsideClick}
         >
             <div
                 ref={modalRef}
-                className="bg-base-100 rounded-2xl shadow-xl w-full max-w-md flex flex-col border border-base-content/5"
+                className="w-full max-w-md rounded-2xl border border-base-content/10 
+                           bg-base-100 shadow-2xl flex flex-col overflow-hidden
+                           transition-all duration-200 scale-100"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex justify-between items-center px-6 py-4 border-b border-base-content/10">
-                    <h2 className="text-xl font-semibold text-base-content">
+                    <h2 className="text-lg font-semibold text-base-content">
                         {title}
                     </h2>
+
                     <button
                         type="button"
                         onClick={onClose}
-                        className="text-base-content/40 hover:text-base-content transition-colors p-1 rounded-full hover:bg-base-200"
+                        className="p-2 rounded-lg text-base-content/50 
+                                   hover:text-base-content hover:bg-base-200 
+                                   transition active:scale-95"
                     >
-                        <X size={20} />
+                        <FiX size={18} />
                     </button>
                 </div>
 
-                {/* Body - scrolls internally */}
-                <div className="px-6 py-5 overflow-y-auto max-h-[70vh] text-sm text-base-content/70">
+                {/* Body */}
+                <div className="px-6 py-5 overflow-y-auto max-h-[70vh] text-base-content">
                     {children}
                 </div>
 
                 {/* Footer */}
                 {footer && (
-                    <div className="px-6 py-4 bg-base-200 flex justify-end gap-3 border-t border-base-content/10 rounded-b-2xl">
+                    <div className="px-6 py-4 border-t border-base-content/10 bg-base-200 flex justify-end gap-3">
                         {footer}
                     </div>
                 )}

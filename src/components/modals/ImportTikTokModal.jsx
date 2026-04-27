@@ -1,80 +1,51 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
+import { FiLoader } from 'react-icons/fi';
+import { FaTiktok } from 'react-icons/fa';
 import { importTikTok } from '../../services/influencerService';
 import BaseModal from './BaseModal';
 
 const ImportTikTokModal = ({ onClose, refresh }) => {
-    const [url, setUrl] = useState("");
+    const [ttUrl, setTtUrl] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleImport = async (e) => {
-        e.preventDefault();
-
-        if (!url.includes("tiktok.com") && !url.startsWith("@")) {
-            return toast.error("Invalid TikTok URL or username");
-        }
-
+        e?.preventDefault();
+        if (!ttUrl.includes("tiktok.com")) return toast.error("Invalid TikTok URL");
         try {
             setLoading(true);
-            const res = await importTikTok(url);
-            
-            if (res && res.message === "Influencer already exists") {
-                toast("Already exists", { icon: "ℹ️" });
-            } else {
-                toast.success("Imported successfully");
-            }
-
-            refresh();
-            onClose();
-        } catch (error) {
-            toast.error(error.message || "Import failed");
-        } finally {
-            setLoading(false);
-        }
+            const res = await importTikTok(ttUrl);
+            if (res && res.message === "Influencer already exists") toast("Already exists", { icon: "ℹ️" });
+            else toast.success("Imported successfully");
+            refresh(); onClose();
+        } catch (error) { toast.error(error.message || "Import failed"); }
+        finally { setLoading(false); }
     };
 
     const footer = (
-        <>
-            <button
-                type="button"
-                onClick={onClose}
-                disabled={loading}
-                className="btn px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 disabled:opacity-50 font-medium"
-            >
-                Cancel
-            </button>
-            <button 
-                type="button"
-                onClick={handleImport}
-                className="btn px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 flex items-center justify-center font-medium min-w-[100px]"
-                disabled={loading || !url.trim()}
-            >
-                {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button type="button" onClick={onClose} disabled={loading} className="px-6 py-2.5 border border-base-content/15 rounded-xl font-semibold text-base-content/70 hover:bg-base-300 transition-all disabled:opacity-50 flex-1 sm:flex-none">Cancel</button>
+            <button type="button" onClick={handleImport} disabled={loading || !ttUrl.trim()} className="px-8 py-2.5 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center min-w-[120px] disabled:opacity-50 flex-1 sm:flex-none">
+                {loading ? <FiLoader className="animate-spin w-4 h-4 mr-2" /> : null}
                 {loading ? "Importing..." : "Import"}
             </button>
-        </>
+        </div>
     );
 
     return (
-        <BaseModal 
-            title="Import TikTok" 
-            onClose={onClose} 
-            footer={footer}
-        >
-            <form onSubmit={handleImport} className="space-y-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    TikTok Profile URL or @username
-                </label>
-                <input
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="https://tiktok.com/@username or @username"
-                    className="input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none"
-                    disabled={loading}
-                    autoFocus
-                />
-            </form>
+        <BaseModal title="Import TikTok" onClose={onClose} footer={footer}>
+            <div className="space-y-6">
+                <div className="p-4 rounded-2xl bg-base-200 border border-base-content/10 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-base-content/10 text-base-content"><FaTiktok className="w-6 h-6" /></div>
+                    <div><h4 className="font-bold text-base-content">TikTok Profile</h4><p className="text-xs text-base-content/50">Enter the profile URL to analyze trends</p></div>
+                </div>
+                <form onSubmit={handleImport} className="space-y-4">
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-bold text-base-content/70 ml-1">Profile URL</label>
+                        <input value={ttUrl} onChange={(e) => setTtUrl(e.target.value)} placeholder="https://tiktok.com/@username" className="w-full px-4 py-3 bg-base-200 border border-base-content/15 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-base-content placeholder:text-base-content/40 h-12 transition-colors" disabled={loading} autoFocus />
+                    </div>
+                </form>
+            </div>
         </BaseModal>
     );
 };

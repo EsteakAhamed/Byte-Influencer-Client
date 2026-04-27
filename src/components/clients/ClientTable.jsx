@@ -2,18 +2,18 @@ import ClientRow from './ClientRow';
 
 const ClientTable = ({ data, onEdit, onDelete }) => {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-base-100 rounded-xl border border-base-content/10 overflow-hidden">
             <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-base-200 border-b border-base-content/10">
                     <tr>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Client Name</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Campaign</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Stats</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
+                        <th className="text-left py-3.5 px-5 text-xs font-bold uppercase tracking-wider text-base-content/50">Client Name</th>
+                        <th className="text-left py-3.5 px-5 text-xs font-bold uppercase tracking-wider text-base-content/50">Campaign</th>
+                        <th className="text-left py-3.5 px-5 text-xs font-bold uppercase tracking-wider text-base-content/50">Status</th>
+                        <th className="text-left py-3.5 px-5 text-xs font-bold uppercase tracking-wider text-base-content/50">Stats</th>
+                        <th className="text-left py-3.5 px-5 text-xs font-bold uppercase tracking-wider text-base-content/50">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-base-content/5">
                     {data.map(client => (
                         <ClientRow
                             key={client._id}

@@ -4,30 +4,28 @@ import StatsBox from './StatsBox';
 
 const ClientRow = ({ client, onEdit, onDelete }) => {
     return (
-        <tr className="border-b border-gray-100 hover:bg-gray-50">
-            <td className="py-4 px-4">
-                <div>
-                    <p className="font-medium text-gray-900">{client.name}</p>
-                </div>
+        <tr className="hover:bg-base-200/60 transition-colors">
+            <td className="py-4 px-5">
+                <p className="font-bold text-base-content">{client.name}</p>
             </td>
-            <td className="py-4 px-4 text-gray-600">{client.campaign}</td>
-            <td className="py-4 px-4">
+            <td className="py-4 px-5 text-base-content/70 font-medium">{client.campaign}</td>
+            <td className="py-4 px-5">
                 <StatusBadge status={client.status} />
             </td>
-            <td className="py-4 px-4">
+            <td className="py-4 px-5">
                 <StatsBox stats={client.stats} />
             </td>
-            <td className="py-4 px-4">
-                <div className="flex gap-2">
+            <td className="py-4 px-5">
+                <div className="flex gap-1.5">
                     <button
                         onClick={() => onEdit(client)}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-base-content/40 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors"
                     >
                         <FiEdit2 className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => onDelete(client)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-base-content/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                     >
                         <FiTrash2 className="w-4 h-4" />
                     </button>

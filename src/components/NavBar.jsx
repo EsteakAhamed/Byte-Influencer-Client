@@ -5,7 +5,28 @@ import { FiLayout, FiUsers, FiBriefcase, FiMenu, FiX, FiSun, FiMoon } from 'reac
 const NavBar = () => {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [isDark, setIsDark] = useState(false);
     const location = useLocation();
+
+    // Initialize theme from localStorage on mount
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+        setIsDark(initialDark);
+        document.documentElement.setAttribute('data-theme', initialDark ? 'dark' : 'light');
+    }, []);
+
+    // Apply theme whenever isDark changes
+    useEffect(() => {
+        const theme = isDark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [isDark]);
+
+    const toggleTheme = () => {
+        setIsDark(prev => !prev);
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -68,14 +89,17 @@ const NavBar = () => {
 
                 <div className="hidden lg:flex items-center gap-4">
                     {/* Theme Toggle */}
-                    <label className="swap swap-rotate p-2.5 rounded-full bg-base-200 text-base-content hover:bg-base-300 transition-all duration-300 hover:scale-110">
-                        <input type="checkbox" className="theme-controller" value="dark" defaultChecked={localStorage.getItem('theme') === 'dark'} onChange={(e) => {
-                            const newTheme = e.target.checked ? 'dark' : 'light';
-                            localStorage.setItem('theme', newTheme);
-                        }} />
-                        <FiSun className="swap-on w-5 h-5" />
-                        <FiMoon className="swap-off w-5 h-5" />
-                    </label>
+                    <button
+                        onClick={toggleTheme}
+                        className="p-2.5 rounded-full bg-base-200 text-base-content hover:bg-base-300 transition-all duration-300 hover:scale-110"
+                        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                    >
+                        {isDark ? (
+                            <FiSun className="w-5 h-5" />
+                        ) : (
+                            <FiMoon className="w-5 h-5" />
+                        )}
+                    </button>
 
                     <button className="relative px-5 py-2.5 text-sm font-semibold text-white rounded-full bg-gradient-to-r from-gray-900 to-gray-800 hover:from-emerald-600 hover:to-teal-600 transition-all duration-500 shadow-lg shadow-gray-900/20 hover:shadow-emerald-500/30 hover:-translate-y-0.5 border-none">
                         Get Started
@@ -84,14 +108,17 @@ const NavBar = () => {
 
                 {/* Mobile Menu Button */}
                 <div className="flex items-center gap-2 lg:hidden">
-                    <label className="swap swap-rotate p-2 rounded-xl text-base-content hover:bg-base-200 transition-all duration-300">
-                        <input type="checkbox" className="theme-controller" value="dark" defaultChecked={localStorage.getItem('theme') === 'dark'} onChange={(e) => {
-                            const newTheme = e.target.checked ? 'dark' : 'light';
-                            localStorage.setItem('theme', newTheme);
-                        }} />
-                        <FiSun className="swap-on w-6 h-6" />
-                        <FiMoon className="swap-off w-6 h-6" />
-                    </label>
+                    <button
+                        onClick={toggleTheme}
+                        className="p-2 rounded-xl text-base-content hover:bg-base-200 transition-all duration-300"
+                        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                    >
+                        {isDark ? (
+                            <FiSun className="w-6 h-6" />
+                        ) : (
+                            <FiMoon className="w-6 h-6" />
+                        )}
+                    </button>
                     <button
                         onClick={() => setOpen(!open)}
                         className="p-2 rounded-xl text-base-content hover:bg-base-200 transition-all duration-300"

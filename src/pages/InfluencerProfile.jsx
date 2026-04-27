@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FiArrowLeft, FiInstagram, FiYoutube, FiFacebook, FiUser, FiUsers, FiHeart, FiEye, FiActivity, FiBriefcase, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FaTiktok } from 'react-icons/fa';
 import { fetchInfluencerProfile, deleteInfluencer, deleteInfluencerPlatform } from '../services/influencerService';
 import EditInfluencerModal from '../components/modals/EditInfluencerModal';
 import DeleteInfluencerModal from '../components/modals/DeleteInfluencerModal';
@@ -11,15 +12,15 @@ const platformIcons = {
     Instagram: FiInstagram,
     YouTube: FiYoutube,
     Facebook: FiFacebook,
-    TikTok: FiUser
+    TikTok: FaTiktok
 };
 
 // Platform colors
 const platformColors = {
-    Instagram: 'from-pink-500 to-purple-600',
-    YouTube: 'from-red-500 to-red-700',
-    Facebook: 'from-blue-500 to-blue-700',
-    TikTok: 'from-gray-800 to-black'
+    Instagram: 'bg-pink-500/15 text-pink-500',
+    YouTube: 'bg-red-500/15 text-red-500',
+    Facebook: 'bg-blue-500/15 text-blue-500',
+    TikTok: 'bg-base-content/10 text-base-content'
 };
 
 const InfluencerProfile = () => {
@@ -166,11 +167,12 @@ const InfluencerProfile = () => {
                         <div className="flex-1">
                             <div className="flex flex-wrap items-center gap-3 mb-2">
                                 <h2 className="text-xl font-bold text-base-content">{profile.name}</h2>
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${
                                     profile.status === 'Active' 
-                                        ? 'bg-emerald-100 text-emerald-700' 
-                                        : 'bg-base-200 text-base-content/70'
+                                        ? 'bg-emerald-500/15 text-emerald-500' 
+                                        : 'bg-base-content/10 text-base-content/50'
                                 }`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${profile.status === 'Active' ? 'bg-emerald-500' : 'bg-base-content/30'}`}></span>
                                     {profile.status}
                                 </span>
                             </div>
@@ -233,7 +235,7 @@ const InfluencerProfile = () => {
                 {activeTab && profile.platformData?.[activeTab] ? (
                     <div className="bg-base-100 rounded-2xl shadow-sm border border-base-content/5 p-6 mb-8">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className={`p-3 rounded-xl bg-gradient-to-br ${platformColors[activeTab] || 'from-gray-500 to-gray-700'} text-white`}>
+                            <div className={`p-3 rounded-xl ${platformColors[activeTab] || 'bg-base-content/10 text-base-content'}`}>
                                 <PlatformIcon className="w-6 h-6" />
                             </div>
                             <div>
@@ -312,10 +314,10 @@ const InfluencerProfile = () => {
                         </div>
                     </div>
 
-                    <div className="text-center py-8 text-gray-400">
-                        <FiBriefcase className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p>No active campaign assignments</p>
-                        <p className="text-sm mt-1">Link this influencer to a client campaign to see it here</p>
+                    <div className="text-center py-8">
+                        <FiBriefcase className="w-12 h-12 mx-auto mb-3 text-base-content/20" />
+                        <p className="text-base-content/40 font-medium">No active campaign assignments</p>
+                        <p className="text-sm mt-1 text-base-content/30">Link this influencer to a client campaign to see it here</p>
                     </div>
                 </div>
             </div>
