@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { FiLayout, FiUsers, FiBriefcase, FiMenu, FiX, FiSun, FiMoon } from 'react-icons/fi';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { FiLayout, FiUsers, FiBriefcase, FiMenu, FiX, FiSun, FiMoon, FiUser, FiLogOut, FiSettings } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
 
 const NavBar = () => {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
+    const { isLoggedIn, user, logout } = useAuth();
 
     // Initialize theme from localStorage on mount
     useEffect(() => {
@@ -49,8 +52,8 @@ const NavBar = () => {
     return (
         <nav
             className={`fixed w-full z-50 transition-all duration-500 bg-base-100/80 dark:bg-base-100/80 backdrop-blur-xl border-b border-base-content/10 ${scrolled
-                    ? 'shadow-lg shadow-base-300/20'
-                    : ''
+                ? 'shadow-lg shadow-base-300/20'
+                : ''
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
@@ -101,9 +104,42 @@ const NavBar = () => {
                         )}
                     </button>
 
-                    <button className="relative px-5 py-2.5 text-sm font-semibold text-white rounded-full bg-gradient-to-r from-gray-900 to-gray-800 hover:from-emerald-600 hover:to-teal-600 transition-all duration-500 shadow-lg shadow-gray-900/20 hover:shadow-emerald-500/30 hover:-translate-y-0.5 border-none">
-                        Get Started
-                    </button>
+                    {!isLoggedIn ? (
+                        <>
+                            <Link to="/login" className="btn btn-ghost rounded-full">
+                                Login
+                            </Link>
+                            <Link to="/register" className="btn btn-primary rounded-full px-6 text-white border-none">
+                                Register
+                            </Link>
+                        </>
+                    ) : (
+                        <div className="dropdown dropdown-end">
+                            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar border border-base-content/10">
+                                <div className="w-10 rounded-full flex items-center justify-center">
+                                    <FiUser className="w-6 h-6 mx-auto mt-2" />
+                                </div>
+                            </div>
+                            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100 rounded-box w-52 border border-base-content/10 backdrop-blur-lg">
+                                <li className="menu-title px-4 py-2 border-b border-base-content/5 mb-1">
+                                    <span className="text-xs font-bold uppercase tracking-wider opacity-50">Account</span>
+                                    <span className="text-sm font-semibold block text-base-content">{user?.username}</span>
+                                </li>
+                                <li>
+                                    <Link to="/profile" className="py-3 flex items-center gap-3">
+                                        <FiSettings className="w-4 h-4" />
+                                        <span>View Profile</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <button onClick={logout} className="py-3 text-error flex items-center gap-3 hover:bg-error/10">
+                                        <FiLogOut className="w-4 h-4" />
+                                        <span>Logout</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -159,18 +195,45 @@ const NavBar = () => {
                             }}
                         >
                             <div className={`p-2 rounded-lg ${location.pathname === to
-                                    ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600'
-                                    : 'bg-base-200 text-base-content/50'
+                                ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600'
+                                : 'bg-base-200 text-base-content/50'
                                 }`}>
                                 <Icon className="w-5 h-5" />
                             </div>
                             <span>{name}</span>
                         </NavLink>
                     ))}
-                    <div className="pt-4 border-t border-base-content/10">
-                        <button className="w-full py-3.5 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-500 shadow-lg">
-                            Get Started
-                        </button>
+                    <div className="pt-4 border-t border-base-content/10 flex flex-col gap-2">
+                        {!isLoggedIn ? (
+                            <>
+                                <Link to="/login" className="btn btn-ghost w-full">
+                                    Login
+                                </Link>
+                                <Link to="/register" className="btn btn-primary w-full text-white border-none">
+                                    Register
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex items-center gap-4 px-4 py-3 bg-base-200 rounded-xl mb-2">
+                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <FiUser size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold">{user?.username}</p>
+                                        <p className="text-xs opacity-60">{user?.email}</p>
+                                    </div>
+                                </div>
+                                <Link to="/profile" className="btn btn-ghost w-full justify-start gap-3">
+                                    <FiSettings size={18} />
+                                    View Profile
+                                </Link>
+                                <button onClick={logout} className="btn btn-error btn-outline w-full justify-start gap-3">
+                                    <FiLogOut size={18} />
+                                    Logout
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
