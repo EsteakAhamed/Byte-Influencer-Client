@@ -5,21 +5,38 @@ import { getMe, updateProfile as updateProfileApi, deleteProfile as deleteProfil
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(
+        localStorage.getItem('byte_user') ? JSON.parse(localStorage.getItem('byte_user')) : null
+    );
     const [loading, setLoading] = useState(true);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('byte_token'));
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const isAdmin = user?.role === 'admin';
+
+    useEffect(() => {
+        if (isLoggingOut) {
+            const timer = setTimeout(() => {
+                setIsLoggingOut(false);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoggingOut]);
 
     const logout = () => {
+        setIsLoggingOut(true);
         localStorage.removeItem('byte_token');
+        localStorage.removeItem('byte_user');
         setUser(null);
         setIsLoggedIn(false);
-        toast.success("Logged out successfully");
     };
 
     const login = (token, userData) => {
         localStorage.setItem('byte_token', token);
+        localStorage.setItem('byte_user', JSON.stringify(userData));
         setUser(userData);
         setIsLoggedIn(true);
+        setIsLoggingOut(false);
     };
 
     const getUser = async () => {
@@ -32,10 +49,12 @@ export const AuthProvider = ({ children }) => {
         try {
             const data = await getMe();
             setUser(data.user);
+            localStorage.setItem('byte_user', JSON.stringify(data.user));
             setIsLoggedIn(true);
         } catch (error) {
             console.error("Auth Error:", error.message);
             localStorage.removeItem('byte_token');
+            localStorage.removeItem('byte_user');
             setIsLoggedIn(false);
             setUser(null);
         } finally {
@@ -75,7 +94,9 @@ export const AuthProvider = ({ children }) => {
             logout,
             getUser,
             updateUsername,
-            deleteUserProfile
+            deleteUserProfile,
+            isAdmin,
+            isLoggingOut
         }}>
             {children}
         </AuthContext.Provider>

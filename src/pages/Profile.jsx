@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Edit, Trash2, ShieldCheck, ChevronLeft } from 'lucide-react';
+import { User, Mail, Edit, Trash2, ShieldCheck, ChevronLeft, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EditProfileModal from '../components/modals/EditProfileModal';
 import DeleteProfileModal from '../components/modals/DeleteProfileModal';
 
 const Profile = () => {
-    const { user, loading } = useAuth();
+    const { user, loading, isAdmin } = useAuth();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -44,10 +44,17 @@ const Profile = () => {
                                 <h2 className="mt-4 text-xl font-bold tracking-tight">{user?.username}</h2>
                                 <p className="text-xs font-bold uppercase tracking-widest opacity-40">Member since {new Date(user?.createdAt).getFullYear()}</p>
                                 
-                                <div className="badge badge-primary badge-outline mt-4 gap-1 py-3 px-4 font-bold text-[10px]">
-                                    <ShieldCheck size={12} />
-                                    VERIFIED USER
-                                </div>
+                                {isAdmin ? (
+                                    <div className="badge badge-warning mt-4 gap-1 py-3 px-4 font-bold text-[10px]">
+                                        <Shield size={12} />
+                                        Admin Account
+                                    </div>
+                                ) : (
+                                    <div className="badge badge-primary badge-outline mt-4 gap-1 py-3 px-4 font-bold text-[10px]">
+                                        <ShieldCheck size={12} />
+                                        VERIFIED USER
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

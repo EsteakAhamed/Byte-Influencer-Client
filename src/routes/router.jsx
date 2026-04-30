@@ -9,6 +9,8 @@ import Register from '../pages/Register.jsx';
 import Login from '../pages/Login.jsx';
 import Profile from '../pages/Profile.jsx';
 import PrivateRoute from './PrivateRoute.jsx';
+import AdminRoute from './AdminRoute.jsx';
+import UserManagement from '../pages/UserManagement.jsx';
 
 export const router = createBrowserRouter([
     {
@@ -20,16 +22,30 @@ export const router = createBrowserRouter([
                 element: <Home />,
             },
             {
-                path: "influencers",
-                element: <InfluencerList /> 
+                element: <PrivateRoute />,
+                children: [
+                    {
+                        path: "influencers",
+                        element: <InfluencerList /> 
+                    },
+                    {
+                        path: "influencers/:id",
+                        element: <InfluencerProfile />
+                    },
+                    {
+                        path: "clients",
+                        element: <ClientList />
+                    }
+                ]
             },
             {
-                path: "influencers/:id",
-                element: <InfluencerProfile />
-            },
-            {
-                path: "clients",
-                element: <ClientList />
+                element: <AdminRoute />,
+                children: [
+                    {
+                        path: "admin/users",
+                        element: <UserManagement />
+                    }
+                ]
             },
             {
                 path: "register",

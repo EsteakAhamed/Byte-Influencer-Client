@@ -9,9 +9,19 @@ const handleAxiosError = (error) => {
     throw new Error(error.message || 'An error occurred');
 };
 
-export const fetchInfluencers = async () => {
+// Helper to get token from localStorage
+const getAuthHeader = () => {
+    const token = localStorage.getItem('byte_token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const fetchInfluencers = async (params = {}) => {
     try {
-        const res = await axios.get(`${API}/influencers`);
+        const { page = 1, limit = 20 } = params;
+        const res = await axios.get(`${API}/influencers`, { 
+            headers: getAuthHeader(),
+            params: { page, limit }
+        });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -20,7 +30,7 @@ export const fetchInfluencers = async () => {
 
 export const fetchInfluencerProfile = async (id) => {
     try {
-        const res = await axios.get(`${API}/influencers/${id}/profile`);
+        const res = await axios.get(`${API}/influencers/${id}/profile`, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -29,7 +39,7 @@ export const fetchInfluencerProfile = async (id) => {
 
 export const importInstagram = async (igUrl) => {
     try {
-        const res = await axios.post(`${API}/influencers/import-ig`, { igUrl });
+        const res = await axios.post(`${API}/influencers/import-ig`, { igUrl }, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -38,7 +48,7 @@ export const importInstagram = async (igUrl) => {
 
 export const importYouTube = async (ytInput) => {
     try {
-        const res = await axios.post(`${API}/influencers/import-youtube`, { ytInput });
+        const res = await axios.post(`${API}/influencers/import-youtube`, { ytInput }, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -47,7 +57,7 @@ export const importYouTube = async (ytInput) => {
 
 export const importFacebook = async (fbUrl) => {
     try {
-        const res = await axios.post(`${API}/influencers/import-facebook`, { fbUrl });
+        const res = await axios.post(`${API}/influencers/import-facebook`, { fbUrl }, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -56,7 +66,7 @@ export const importFacebook = async (fbUrl) => {
 
 export const importTikTok = async (url) => {
     try {
-        const res = await axios.post(`${API}/influencers/import-tiktok`, { url });
+        const res = await axios.post(`${API}/influencers/import-tiktok`, { url }, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -65,7 +75,7 @@ export const importTikTok = async (url) => {
 
 export const updateInfluencer = async (id, data) => {
     try {
-        const res = await axios.patch(`${API}/influencers/${id}`, data);
+        const res = await axios.patch(`${API}/influencers/${id}`, data, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -74,7 +84,7 @@ export const updateInfluencer = async (id, data) => {
 
 export const deleteInfluencer = async (id) => {
     try {
-        const res = await axios.delete(`${API}/influencers/${id}`);
+        const res = await axios.delete(`${API}/influencers/${id}`, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
@@ -84,7 +94,8 @@ export const deleteInfluencer = async (id) => {
 export const deleteInfluencerPlatform = async (id, platformName, deleteIfEmpty = false) => {
     try {
         const res = await axios.delete(
-            `${API}/influencers/${id}/platform/${encodeURIComponent(platformName)}?deleteIfEmpty=${deleteIfEmpty}`
+            `${API}/influencers/${id}/platform/${encodeURIComponent(platformName)}?deleteIfEmpty=${deleteIfEmpty}`,
+            { headers: getAuthHeader() }
         );
         return res.data;
     } catch (error) {

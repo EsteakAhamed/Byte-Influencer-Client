@@ -61,7 +61,7 @@ const Footer = () => {
                     <p className="text-base-content/60 mb-8">
                         Get insights on influencer marketing trends and platform updates.
                     </p>
-                    
+
                     <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                         <div className="relative flex-1">
                             <input
@@ -76,11 +76,10 @@ const Footer = () => {
                         <button
                             type="submit"
                             disabled={subscribed}
-                            className={`px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
-                                subscribed
+                            className={`px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${subscribed
                                     ? 'bg-emerald-500 text-white'
                                     : 'bg-base-content text-base-100 hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/25'
-                            }`}
+                                }`}
                         >
                             {subscribed ? (
                                 <>
@@ -110,7 +109,7 @@ const Footer = () => {
                         <p className="text-base-content/60 text-sm leading-relaxed max-w-xs mb-6">
                             The ultimate management platform for influencer marketing. Track, analyze, and grow your creator partnerships.
                         </p>
-                        
+
                         {/* Social Links */}
                         <div className="flex gap-3">
                             {socials.map(({ icon: Icon, href, label }) => (

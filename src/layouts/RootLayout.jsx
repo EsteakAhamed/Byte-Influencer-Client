@@ -3,7 +3,7 @@ import { Outlet, useNavigation } from 'react-router-dom';
 import NavBar from '../components/NavBar.jsx';
 import Footer from '../components/Footer.jsx';
 import LoadingSpinner from '../components/LoadingSpinner.jsx';
-import { Toaster } from 'react-hot-toast'; 
+import { Toaster } from 'react-hot-toast';
 
 const RootLayout = () => {
     const navigation = useNavigation();

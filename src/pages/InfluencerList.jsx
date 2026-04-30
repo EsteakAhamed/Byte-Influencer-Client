@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
     FiLoader, FiInbox, FiUsers, FiTrendingUp, FiHeart,
@@ -7,6 +8,7 @@ import {
 import { FaInstagram, FaYoutube, FaFacebook, FaTiktok } from 'react-icons/fa';
 
 import InfluencerTable from '../components/influencers/InfluencerTable';
+import Pagination from '../components/Pagination';
 import ImportInstagramModal from '../components/modals/ImportInstagramModal';
 import ImportYouTubeModal from '../components/modals/ImportYouTubeModal';
 import ImportFacebookModal from '../components/modals/ImportFacebookModal';
@@ -39,11 +41,14 @@ const StatCard = ({ icon: Icon, label, value, subtext }) => (
 );
 
 const InfluencerList = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [creators, setCreators] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [selectedPlatform, setSelectedPlatform] = useState('all');
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || "");
+    const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || "");
+    const [selectedPlatform, setSelectedPlatform] = useState(searchParams.get('platform') || 'all');
+    const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
+    const [pagination, setPagination] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showIG, setShowIG] = useState(false);
     const [showYT, setShowYT] = useState(false);
@@ -52,11 +57,14 @@ const InfluencerList = () => {
     const [editing, setEditing] = useState(null);
     const [deleting, setDeleting] = useState(null);
 
-    const loadCreators = async () => {
+    const loadCreators = async (page = currentPage) => {
         try {
             setLoading(true);
-            const data = await fetchInfluencers();
-            if (data) setCreators(data);
+            const response = await fetchInfluencers({ page, limit: 20 });
+            if (response?.success) {
+                setCreators(response.data);
+                setPagination(response.pagination);
+            }
         } catch (err) { toast.error(err.message || "Failed to load influencers"); }
         finally { setLoading(false); }
     };
@@ -68,6 +76,25 @@ const InfluencerList = () => {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
+    // Update URL params when state changes
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (searchTerm) params.set('search', searchTerm);
+        if (selectedPlatform !== 'all') params.set('platform', selectedPlatform);
+        if (currentPage > 1) params.set('page', currentPage);
+        setSearchParams(params);
+    }, [searchTerm, selectedPlatform, currentPage, setSearchParams]);
+
+    // Reset page to 1 when search or platform changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearch, selectedPlatform]);
+
+    // Reload when page changes
+    useEffect(() => {
+        loadCreators(currentPage);
+    }, [currentPage]);
+
     const stats = useMemo(() => {
         const totalFollowers = creators.reduce((sum, c) => sum + (c.followers || 0), 0);
         const avgEngagement = creators.length
@@ -75,12 +102,12 @@ const InfluencerList = () => {
             : 0;
         const platformCount = new Set(creators.flatMap(c => c.platforms || [])).size;
         return {
-            total: creators.length,
+            total: pagination?.totalCount || creators.length,
             followers: totalFollowers >= 1000000 ? `${(totalFollowers / 1000000).toFixed(1)}M` : `${(totalFollowers / 1000).toFixed(0)}K`,
             engagement: avgEngagement.toFixed(1),
             platforms: platformCount
         };
-    }, [creators]);
+    }, [creators, pagination]);
 
     const filtered = useMemo(() => {
         let result = creators;
@@ -199,8 +226,19 @@ const InfluencerList = () => {
             </div>
 
             {/* Table */}
-            {filtered.length > 0 ? (
-                <InfluencerTable data={filtered} onDelete={(id) => setDeleting(creators.find(c => c._id === id))} onEdit={setEditing} />
+            {creators.length > 0 ? (
+                <>
+                    <InfluencerTable data={creators} onDelete={(id) => setDeleting(creators.find(c => c._id === id))} onEdit={setEditing} />
+                    {pagination && (
+                        <Pagination
+                            currentPage={pagination.currentPage}
+                            totalPages={pagination.totalPages}
+                            totalCount={pagination.totalCount}
+                            limit={pagination.limit}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             ) : (
                 <div className="text-center py-20">
                     <FiInbox className="mx-auto mb-4 w-12 h-12 text-base-content/20" />

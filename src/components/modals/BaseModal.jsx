@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { FiX } from 'react-icons/fi';
 
 const BaseModal = ({
+    isOpen = true,
     onClose,
     title,
     children,
@@ -27,11 +28,14 @@ const BaseModal = ({
 
     // Prevent background scrolling
     useEffect(() => {
+        if (!isOpen) return;
         document.body.style.overflow = 'hidden';
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, []);
+    }, [isOpen]);
+
+    if (!isOpen) return null;
 
     return (
         <div

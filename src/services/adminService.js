@@ -14,40 +14,36 @@ const getAuthHeader = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const fetchClients = async (params = {}) => {
+export const getAllUsers = async () => {
     try {
-        const { page = 1, limit = 20 } = params;
-        const res = await axios.get(`${API}/clients`, { 
-            headers: getAuthHeader(),
-            params: { page, limit }
-        });
+        const res = await axios.get(`${API}/admin/users`, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
     }
 };
 
-export const createClient = async (data) => {
+export const updateUser = async (id, data) => {
     try {
-        const res = await axios.post(`${API}/clients`, data, { headers: getAuthHeader() });
+        const res = await axios.patch(`${API}/admin/users/${id}`, data, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
     }
 };
 
-export const updateClient = async (id, data) => {
+export const deleteUser = async (id) => {
     try {
-        const res = await axios.patch(`${API}/clients/${id}`, data, { headers: getAuthHeader() });
+        const res = await axios.delete(`${API}/admin/users/${id}`, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);
     }
 };
 
-export const deleteClient = async (id) => {
+export const promoteToAdmin = async (id) => {
     try {
-        const res = await axios.delete(`${API}/clients/${id}`, { headers: getAuthHeader() });
+        const res = await axios.patch(`${API}/admin/users/${id}/role`, { role: 'admin' }, { headers: getAuthHeader() });
         return res.data;
     } catch (error) {
         handleAxiosError(error);

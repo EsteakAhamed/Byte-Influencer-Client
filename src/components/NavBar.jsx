@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FiLayout, FiUsers, FiBriefcase, FiMenu, FiX, FiSun, FiMoon, FiUser, FiLogOut, FiSettings } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 const NavBar = () => {
@@ -9,7 +10,7 @@ const NavBar = () => {
     const [isDark, setIsDark] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    const { isLoggedIn, user, logout } = useAuth();
+    const { isLoggedIn, user, logout, isAdmin } = useAuth();
 
     // Initialize theme from localStorage on mount
     useEffect(() => {
@@ -44,10 +45,16 @@ const NavBar = () => {
     }, [location]);
 
     const navItems = [
-        { name: 'Dashboard', to: '/', icon: FiLayout },
-        { name: 'Influencers', to: '/influencers', icon: FiUsers },
-        { name: 'Clients', to: '/clients', icon: FiBriefcase },
+        { name: 'Dashboard', to: '/', icon: FiLayout }
     ];
+
+    if (isLoggedIn) {
+        navItems.push({ name: 'Influencers', to: '/influencers', icon: FiUsers });
+        navItems.push({ name: 'Clients', to: '/clients', icon: FiBriefcase });
+        if (isAdmin) {
+            navItems.push({ name: 'Users', to: '/admin/users', icon: FiUser });
+        }
+    }
 
     return (
         <nav
@@ -132,7 +139,11 @@ const NavBar = () => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <button onClick={logout} className="py-3 text-error flex items-center gap-3 hover:bg-error/10">
+                                    <button onClick={() => {
+                                        logout();
+                                        toast.success('Logged out successfully');
+                                        navigate('/', { replace: true });
+                                    }} className="py-3 text-error flex items-center gap-3 hover:bg-error/10">
                                         <FiLogOut className="w-4 h-4" />
                                         <span>Logout</span>
                                     </button>
@@ -228,7 +239,11 @@ const NavBar = () => {
                                     <FiSettings size={18} />
                                     View Profile
                                 </Link>
-                                <button onClick={logout} className="btn btn-error btn-outline w-full justify-start gap-3">
+                                <button onClick={() => {
+                                    logout();
+                                    toast.success('Logged out successfully');
+                                    navigate('/', { replace: true });
+                                }} className="btn btn-error btn-outline w-full justify-start gap-3">
                                     <FiLogOut size={18} />
                                     Logout
                                 </button>

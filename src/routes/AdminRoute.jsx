@@ -1,12 +1,12 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
 
-const PrivateRoute = ({ children }) => {
-    const { isLoggedIn, loading, isLoggingOut } = useAuth();
-    const toastShownRef = useRef(false);
+const AdminRoute = ({ children }) => {
+    const { isLoggedIn, isAdmin, loading, isLoggingOut } = useAuth();
+    const toastShownRef = React.useRef(false);
 
     if (loading) {
         return (
@@ -24,7 +24,12 @@ const PrivateRoute = ({ children }) => {
         return <Navigate to="/login" replace />;
     }
 
+    if (!isAdmin) {
+        toast.error('Access denied. Admin only.');
+        return <Navigate to="/" replace />;
+    }
+
     return children ? children : <Outlet />;
 };
 
-export default PrivateRoute;
+export default AdminRoute;
