@@ -5,6 +5,7 @@ import { getMe, updateProfile as updateProfileApi, deleteProfile as deleteProfil
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    // Restore session from localStorage to avoid login flicker on refresh
     const [user, setUser] = useState(
         localStorage.getItem('byte_user') ? JSON.parse(localStorage.getItem('byte_user')) : null
     );
@@ -12,8 +13,10 @@ export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('byte_token'));
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+    // Derived state — cleaner than checking role everywhere
     const isAdmin = user?.role === 'admin';
 
+    // Clear logout flag after animation completes
     useEffect(() => {
         if (isLoggingOut) {
             const timer = setTimeout(() => {
@@ -23,6 +26,7 @@ export const AuthProvider = ({ children }) => {
         }
     }, [isLoggingOut]);
 
+    // Clear all auth data and trigger logout animation
     const logout = () => {
         setIsLoggingOut(true);
         localStorage.removeItem('byte_token');
@@ -31,6 +35,7 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(false);
     };
 
+    // Persist auth data so session survives page refresh
     const login = (token, userData) => {
         localStorage.setItem('byte_token', token);
         localStorage.setItem('byte_user', JSON.stringify(userData));
@@ -39,6 +44,7 @@ export const AuthProvider = ({ children }) => {
         setIsLoggingOut(false);
     };
 
+    // Validate token and refresh user data on app load
     const getUser = async () => {
         const token = localStorage.getItem('byte_token');
         if (!token) {
@@ -52,6 +58,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('byte_user', JSON.stringify(data.user));
             setIsLoggedIn(true);
         } catch (error) {
+            // Token expired or invalid — clean up
             console.error("Auth Error:", error.message);
             localStorage.removeItem('byte_token');
             localStorage.removeItem('byte_user');
@@ -81,6 +88,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Check auth status once on mount
     useEffect(() => {
         getUser();
     }, []);

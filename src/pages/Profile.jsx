@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Edit, Trash2, ShieldCheck, ChevronLeft, Shield } from 'lucide-react';
+import { User, Mail, Edit, Trash2, ShieldCheck, ChevronLeft, Shield, Key } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EditProfileModal from '../components/modals/EditProfileModal';
 import DeleteProfileModal from '../components/modals/DeleteProfileModal';
+import ChangePasswordModal from '../components/modals/ChangePasswordModal';
 
 const Profile = () => {
     const { user, loading, isAdmin } = useAuth();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
 
     if (loading) {
@@ -32,7 +34,7 @@ const Profile = () => {
                     {/* Sidebar / Mini Info */}
                     <div className="w-full md:w-64 space-y-4">
                         <div className="card bg-base-100 shadow-xl border border-base-content/5 overflow-hidden">
-                            <div className="h-24 bg-gradient-to-r from-primary/20 to-teal-500/20"></div>
+                            <div className="h-24 bg-linear-to-r from-primary/20 to-teal-500/20"></div>
                             <div className="card-body -mt-12 items-center text-center p-6">
                                 <div className="avatar">
                                     <div className="w-24 h-24 rounded-2xl bg-base-100 p-1 shadow-lg ring ring-primary ring-offset-base-100 ring-offset-2">
@@ -63,18 +65,26 @@ const Profile = () => {
                     <div className="flex-1 w-full space-y-6">
                         <div className="card bg-base-100 shadow-xl border border-base-content/5">
                             <div className="card-body p-8">
-                                <div className="flex items-center justify-between mb-8">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                                     <div>
                                         <h1 className="text-2xl font-black tracking-tight">Your Profile</h1>
                                         <p className="text-base-content/60 text-sm mt-1">Manage your account settings and preferences</p>
                                     </div>
                                     <div className="flex gap-2">
-                                        <button 
+                                        <button
                                             onClick={() => setIsEditModalOpen(true)}
-                                            className="btn btn-primary btn-sm text-white gap-2"
+                                            className="btn btn-primary btn-sm text-white gap-2 flex-1 sm:flex-none"
                                         >
                                             <Edit size={16} />
-                                            Edit
+                                            <span>Edit</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setIsChangePasswordModalOpen(true)}
+                                            className="btn btn-outline btn-primary btn-sm gap-2 flex-1 sm:flex-none"
+                                        >
+                                            <Key size={16} />
+                                            <span className="hidden sm:inline">Password</span>
+                                            <span className="sm:hidden">Pass</span>
                                         </button>
                                     </div>
                                 </div>
@@ -133,6 +143,10 @@ const Profile = () => {
             <DeleteProfileModal 
                 isOpen={isDeleteModalOpen} 
                 onClose={() => setIsDeleteModalOpen(false)} 
+            />
+            <ChangePasswordModal 
+                isOpen={isChangePasswordModalOpen} 
+                onClose={() => setIsChangePasswordModalOpen(false)} 
             />
         </div>
     );

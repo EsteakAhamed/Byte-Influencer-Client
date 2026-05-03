@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Extract readable error from axios response
 const handleAxiosError = (error) => {
     if (error.response && error.response.data && error.response.data.message) {
         throw new Error(error.response.data.message);
@@ -9,12 +10,13 @@ const handleAxiosError = (error) => {
     throw new Error(error.message || 'An error occurred');
 };
 
-// Helper to get token from localStorage
+// Attach JWT token to all requests
 const getAuthHeader = () => {
     const token = localStorage.getItem('byte_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+// Get paginated list of influencers (filtered by user server-side)
 export const fetchInfluencers = async (params = {}) => {
     try {
         const { page = 1, limit = 20 } = params;
@@ -91,6 +93,7 @@ export const deleteInfluencer = async (id) => {
     }
 };
 
+// Remove specific platform from influencer (optionally delete whole influencer if no platforms left)
 export const deleteInfluencerPlatform = async (id, platformName, deleteIfEmpty = false) => {
     try {
         const res = await axios.delete(

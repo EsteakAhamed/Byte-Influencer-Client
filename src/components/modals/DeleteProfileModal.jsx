@@ -9,6 +9,7 @@ const DeleteProfileModal = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Permanently delete account and redirect to home
     const handleDelete = async () => {
         setLoading(true);
         try {
@@ -22,6 +23,7 @@ const DeleteProfileModal = ({ isOpen, onClose }) => {
         }
     };
 
+    // Prevent rendering if modal is closed
     if (!isOpen) return null;
 
     return (

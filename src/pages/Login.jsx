@@ -31,13 +31,13 @@ const Login = () => {
         setLoading(true);
         try {
             const response = await loginUser(data);
-            
-            // Use context login to update state immediately
+
+            // Store auth data and update context state
             login(response.token, response.user);
-            
+
             toast.success(response.message || "Welcome back!");
-            
-            // Redirect to home
+
+            // Send to dashboard after successful login
             navigate('/');
         } catch (error) {
             toast.error(error.message);

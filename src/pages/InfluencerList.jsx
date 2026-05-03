@@ -13,9 +13,9 @@ import ImportInstagramModal from '../components/modals/ImportInstagramModal';
 import ImportYouTubeModal from '../components/modals/ImportYouTubeModal';
 import ImportFacebookModal from '../components/modals/ImportFacebookModal';
 import ImportTikTokModal from '../components/modals/ImportTikTokModal';
-import EditInfluencerModal from '../components/modals/EditInfluencerModal';
 import DeleteInfluencerModal from '../components/modals/DeleteInfluencerModal';
 import { fetchInfluencers, deleteInfluencer, deleteInfluencerPlatform } from '../services/influencerService';
+import EditInfluencerModal from '../components/modals/EditInfluencerModal';
 
 const PLATFORMS = [
     { id: 'all', label: 'All', icon: FiFilter },

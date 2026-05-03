@@ -21,3 +21,9 @@
     @apply text-emerald-600 font-bold border-b-2 border-emerald-600 pb-1;
   }
 }
+
+@layer components {
+  .brand-gradient {
+    @apply bg-linear-to-r from-emerald-500 to-teal-600 bg-clip-text text-transparent;
+  }
+}

@@ -41,6 +41,7 @@ const Register = () => {
 
     const password = watch("password", "");
 
+    // Calculate strength score (0-4) based on password complexity
     const getPasswordStrength = (pass) => {
         if (!pass) return 0;
         let score = 0;
@@ -53,6 +54,7 @@ const Register = () => {
 
     const strength = getPasswordStrength(password);
 
+    // Submit registration and redirect to login on success
     const onSubmit = async (data) => {
         setLoading(true);
         try {

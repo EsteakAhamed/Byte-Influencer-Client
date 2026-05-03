@@ -28,6 +28,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         }
     });
 
+    // Pre-fill form when user data loads
     useEffect(() => {
         if (user) {
             reset({ username: user.username });
@@ -47,6 +48,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         }
     };
 
+    // Prevent rendering if modal is closed
     if (!isOpen) return null;
 
     return (

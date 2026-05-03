@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Extract readable error message from axios response
 const handleAxiosError = (error) => {
     if (error.response && error.response.data && error.response.data.message) {
         throw new Error(error.response.data.message);
@@ -9,7 +10,7 @@ const handleAxiosError = (error) => {
     throw new Error(error.message || 'An error occurred');
 };
 
-// Helper to get token from localStorage
+// Pull token from storage for authenticated requests
 const getAuthHeader = () => {
     const token = localStorage.getItem('byte_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -33,6 +34,7 @@ export const loginUser = async (credentials) => {
     }
 };
 
+// Fetch current user — used to validate stored token on app load
 export const getMe = async () => {
     try {
         const res = await axios.get(`${API}/auth/me`, {

@@ -9,9 +9,9 @@ import {
 import ClientTable from '../components/clients/ClientTable';
 import Pagination from '../components/Pagination';
 import CreateClientModal from '../components/modals/CreateClientModal';
-import EditClientModal from '../components/modals/EditClientModal';
 import DeleteClientModal from '../components/modals/DeleteClientModal';
 import { fetchClients, deleteClient } from '../services/clientService';
+import EditClientModal from '../components/modals/EditClientModal';
 
 const STATUS_FILTER = [
     { id: 'all', label: 'All', icon: FiFilter },

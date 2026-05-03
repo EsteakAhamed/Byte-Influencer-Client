@@ -4,8 +4,10 @@ import NavBar from '../components/NavBar.jsx';
 import Footer from '../components/Footer.jsx';
 import LoadingSpinner from '../components/LoadingSpinner.jsx';
 import { Toaster } from 'react-hot-toast';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 const RootLayout = () => {
+    useScrollToTop();
     const navigation = useNavigation();
     const isLoading = navigation.state === 'loading';
 
