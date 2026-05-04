@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import EditProfileModal from '../components/modals/EditProfileModal';
 import DeleteProfileModal from '../components/modals/DeleteProfileModal';
 import ChangePasswordModal from '../components/modals/ChangePasswordModal';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Profile = () => {
     const { user, loading, isAdmin } = useAuth();
@@ -14,11 +15,7 @@ const Profile = () => {
 
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
-            </div>
-        );
+        return <LoadingSpinner inline message="Loading profile..." />;
     }
 
     return (

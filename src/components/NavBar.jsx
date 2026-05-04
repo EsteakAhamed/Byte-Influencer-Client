@@ -11,7 +11,7 @@ import {
     FiUser,
     FiLogOut,
     FiSettings,
-    FiChevronDown
+    FiChevronDown,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -53,12 +53,13 @@ const NavBar = () => {
     useEffect(() => setOpen(false), [location]);
 
     // Build nav items based on auth state and role
-    const navItems = [{ name: 'Dashboard', to: '/', icon: FiLayout }];
-    if (isLoggedIn) {
-        navItems.push({ name: 'Influencers', to: '/influencers', icon: FiUsers });
-        navItems.push({ name: 'Clients', to: '/clients', icon: FiBriefcase });
-        if (isAdmin) navItems.push({ name: 'Users', to: '/admin/users', icon: FiUser });
-    }
+    // Build nav items based on auth state and role declaratively
+    const navItems = isLoggedIn ? [
+        { name: 'Dashboard', to: '/', icon: FiLayout },
+        { name: 'Influencers', to: '/influencers', icon: FiUsers },
+        { name: 'Clients', to: '/clients', icon: FiBriefcase },
+        ...(isAdmin ? [{ name: 'Users', to: '/admin/users', icon: FiUser }] : [])
+    ] : [];
 
     return (
         <nav

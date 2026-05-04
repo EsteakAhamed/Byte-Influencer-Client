@@ -9,8 +9,10 @@ import {
     FiInstagram,
     FiSend
 } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
 
 const Footer = () => {
+    const { isLoggedIn } = useAuth();
     const [email, setEmail] = useState('');
     const [subscribed, setSubscribed] = useState(false);
 
@@ -56,45 +58,47 @@ const Footer = () => {
 
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 {/* Newsletter Card - Glassmorphism style */}
-                <div className="relative mb-24 p-8 md:p-12 rounded-[2rem] bg-linear-to-br from-base-200 to-base-100 border border-base-content/5 shadow-2xl shadow-emerald-500/5">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div>
-                            <h3 className="text-3xl md:text-4xl font-black tracking-tight mb-4 italic">
-                                Stay ahead of the <span className="text-emerald-500">curve.</span>
-                            </h3>
-                            <p className="text-base-content/60 text-lg">
-                                Join 5,000+ creators and brands receiving weekly insights on the creator economy.
-                            </p>
-                        </div>
-
-                        <form onSubmit={handleSubscribe} className="relative group">
-                            <div className="flex flex-col sm:flex-row gap-3 p-2 bg-base-100 rounded-2xl border border-base-content/10 focus-within:border-emerald-500/50 transition-all shadow-inner">
-                                <div className="flex-1 flex items-center px-4 gap-3">
-                                    <FiSend className="text-emerald-500 opacity-50" />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Enter your work email"
-                                        className="w-full py-3 bg-transparent focus:outline-none text-sm font-medium"
-                                        required
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    disabled={subscribed}
-                                    className={`px-8 py-3 rounded-xl font-bold transition-all duration-500 flex items-center justify-center gap-2 ${subscribed
-                                        ? 'bg-emerald-500 text-white scale-95'
-                                        : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 active:scale-95'
-                                        }`}
-                                >
-                                    {subscribed ? <FiCheck /> : <FiArrowRight />}
-                                    {subscribed ? 'Subscribed' : 'Join Now'}
-                                </button>
+                {!isLoggedIn && (
+                    <div className="relative mb-24 p-8 md:p-12 rounded-[2rem] bg-linear-to-br from-base-200 to-base-100 border border-base-content/5 shadow-2xl shadow-emerald-500/5">
+                        <div className="grid lg:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <h3 className="text-3xl md:text-4xl font-black tracking-tight mb-4 italic">
+                                    Stay ahead of the <span className="text-emerald-500">curve.</span>
+                                </h3>
+                                <p className="text-base-content/60 text-lg">
+                                    Join 5,000+ creators and brands receiving weekly insights on the creator economy.
+                                </p>
                             </div>
-                        </form>
+
+                            <form onSubmit={handleSubscribe} className="relative group">
+                                <div className="flex flex-col sm:flex-row gap-3 p-2 bg-base-100 rounded-2xl border border-base-content/10 focus-within:border-emerald-500/50 transition-all shadow-inner">
+                                    <div className="flex-1 flex items-center px-4 gap-3">
+                                        <FiSend className="text-emerald-500 opacity-50" />
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="Enter your work email"
+                                            className="w-full py-3 bg-transparent focus:outline-none text-sm font-medium"
+                                            required
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={subscribed}
+                                        className={`px-8 py-3 rounded-xl font-bold transition-all duration-500 flex items-center justify-center gap-2 ${subscribed
+                                            ? 'bg-emerald-500 text-white scale-95'
+                                            : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 active:scale-95'
+                                            }`}
+                                    >
+                                        {subscribed ? <FiCheck /> : <FiArrowRight />}
+                                        {subscribed ? 'Subscribed' : 'Join Now'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Main Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-12 mb-20">
@@ -151,10 +155,10 @@ const Footer = () => {
                 {/* Bottom Copyright Area */}
                 <div className="pt-8 border-t border-base-content/5 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-4 text-xs font-bold text-base-content/40">
-                        <span>© {new Date().getFullYear()} BYTE LABS INC.</span>
+                        <span>© {new Date().getFullYear()} Dragon Digitals </span>
                         <span className="w-1 h-1 rounded-full bg-base-content/20" />
                         <span className="flex items-center gap-1">
-                            MADE WITH <span className="text-orange-500 text-base">♥</span> DRAGON DIGITALS
+                            MADE WITH <span className="text-red-500 text-base">♥</span> Md. Esteak Ahamed
                         </span>
                     </div>
 

@@ -56,7 +56,7 @@ const UserManagement = () => {
         return matchesSearch && matchesRole;
     });
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>;
+    if (loading) return <LoadingSpinner inline message="Loading users..." />;
 
     return (
         <div className="min-h-screen bg-base-200/50 pt-24 pb-20 px-4">

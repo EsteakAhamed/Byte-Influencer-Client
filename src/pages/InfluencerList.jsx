@@ -16,6 +16,7 @@ import ImportTikTokModal from '../components/modals/ImportTikTokModal';
 import DeleteInfluencerModal from '../components/modals/DeleteInfluencerModal';
 import { fetchInfluencers, deleteInfluencer, deleteInfluencerPlatform } from '../services/influencerService';
 import EditInfluencerModal from '../components/modals/EditInfluencerModal';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const PLATFORMS = [
     { id: 'all', label: 'All', icon: FiFilter },
@@ -149,11 +150,7 @@ const InfluencerList = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[60vh]">
-                <FiLoader className="animate-spin w-10 h-10 text-base-content/30" />
-            </div>
-        );
+        return <LoadingSpinner inline message="Loading creators..." />;
     }
 
     return (

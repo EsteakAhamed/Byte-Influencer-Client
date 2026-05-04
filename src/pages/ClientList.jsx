@@ -12,6 +12,7 @@ import CreateClientModal from '../components/modals/CreateClientModal';
 import DeleteClientModal from '../components/modals/DeleteClientModal';
 import { fetchClients, deleteClient } from '../services/clientService';
 import EditClientModal from '../components/modals/EditClientModal';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const STATUS_FILTER = [
     { id: 'all', label: 'All', icon: FiFilter },
@@ -124,11 +125,7 @@ const ClientList = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[60vh]">
-                <FiLoader className="animate-spin w-10 h-10 text-base-content/30" />
-            </div>
-        );
+        return <LoadingSpinner inline message="Loading clients..." />;
     }
 
     return (

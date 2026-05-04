@@ -8,6 +8,7 @@ import ChartCard from '../../components/dashboard/ChartCard';
 import { formatFollowers, formatDate } from '../../utils/formatNumbers';
 import { useAuth } from '../../context/AuthContext';
 import { fetchUserDashboard } from '../../services/dashboardService';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const PLATFORM_COLORS = {
     Instagram: '#E1306C',
@@ -54,14 +55,7 @@ const UserDashboard = () => {
     });
 
     if (loading) {
-        return (
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="flex items-center gap-3 text-base-content/50">
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                    <span className="font-medium">Loading dashboard...</span>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner inline message="Loading dashboard..." />;
     }
 
     if (!data) {
