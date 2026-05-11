@@ -16,10 +16,10 @@ const getAuthHeader = () => {
 
 export const fetchClients = async (params = {}) => {
     try {
-        const { page = 1, limit = 20 } = params;
+        const { page = 1, limit = 20, search = '' } = params;
         const res = await axios.get(`${API}/clients`, { 
             headers: getAuthHeader(),
-            params: { page, limit }
+            params: { page, limit, search }
         });
         return res.data;
     } catch (error) {

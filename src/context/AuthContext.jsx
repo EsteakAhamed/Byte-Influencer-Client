@@ -5,7 +5,7 @@ import { getMe, updateProfile as updateProfileApi, deleteProfile as deleteProfil
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    // Restore session from localStorage to avoid login flicker on refresh
+    // Restore session from localStorage 
     const [user, setUser] = useState(
         localStorage.getItem('byte_user') ? JSON.parse(localStorage.getItem('byte_user')) : null
     );
@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     // Derived state — cleaner than checking role everywhere
     const isAdmin = user?.role === 'admin';
 
-    // Clear logout flag after animation completes
+    // Clear logout flag 
     useEffect(() => {
         if (isLoggingOut) {
             const timer = setTimeout(() => {
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         }
     }, [isLoggingOut]);
 
-    // Clear all auth data and trigger logout animation
+    // Clear all auth data and trigger logout
     const logout = () => {
         setIsLoggingOut(true);
         localStorage.removeItem('byte_token');

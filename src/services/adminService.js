@@ -49,3 +49,41 @@ export const promoteToAdmin = async (id) => {
         handleAxiosError(error);
     }
 };
+
+// --- Assignment ---
+
+export const assignInfluencerToUser = async (influencerId, userId) => {
+    try {
+        const res = await axios.post(`${API}/admin/assign/influencer/${influencerId}`, { userId }, { headers: getAuthHeader() });
+        return res.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};
+
+export const unassignInfluencer = async (influencerId) => {
+    try {
+        const res = await axios.delete(`${API}/admin/assign/influencer/${influencerId}`, { headers: getAuthHeader() });
+        return res.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};
+
+export const assignClientToUser = async (clientId, userId) => {
+    try {
+        const res = await axios.post(`${API}/admin/assign/client/${clientId}`, { userId }, { headers: getAuthHeader() });
+        return res.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};
+
+export const unassignClient = async (clientId) => {
+    try {
+        const res = await axios.delete(`${API}/admin/assign/client/${clientId}`, { headers: getAuthHeader() });
+        return res.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};

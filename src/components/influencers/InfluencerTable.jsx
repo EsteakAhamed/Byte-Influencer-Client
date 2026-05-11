@@ -1,6 +1,6 @@
 import InfluencerRow from './InfluencerRow';
 
-const InfluencerTable = ({ data, onDelete, onEdit }) => {
+const InfluencerTable = ({ data, onDelete, onEdit, onAssign }) => {
     return (
         <div className="bg-base-100 rounded-xl border border-base-content/10 overflow-hidden">
             <table className="table w-full">
@@ -17,7 +17,7 @@ const InfluencerTable = ({ data, onDelete, onEdit }) => {
                 </thead>
                 <tbody>
                     {data.map(c => (
-                        <InfluencerRow key={c._id} c={c} onDelete={onDelete} onEdit={onEdit} />
+                        <InfluencerRow key={c._id} c={c} onDelete={onDelete} onEdit={onEdit} onAssign={onAssign} />
                     ))}
                 </tbody>
             </table>

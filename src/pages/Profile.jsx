@@ -41,7 +41,13 @@ const Profile = () => {
                                     </div>
                                 </div>
                                 <h2 className="mt-4 text-xl font-bold tracking-tight">{user?.username}</h2>
-                                <p className="text-xs font-bold uppercase tracking-widest opacity-40">Member since {new Date(user?.createdAt).getFullYear()}</p>
+                                {user?.createdAt && !isNaN(new Date(user.createdAt).getTime()) ? (
+                                    <p className="text-xs font-bold uppercase tracking-widest opacity-40">
+                                        Member since {new Date(user.createdAt).getFullYear()}
+                                    </p>
+                                ) : (
+                                    <p className="text-xs font-bold uppercase tracking-widest opacity-40">Verified Member</p>
+                                )}
                                 
                                 {isAdmin ? (
                                     <div className="badge badge-warning mt-4 gap-1 py-3 px-4 font-bold text-[10px]">

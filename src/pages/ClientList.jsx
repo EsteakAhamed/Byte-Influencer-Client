@@ -8,8 +8,10 @@ import {
 
 import ClientTable from '../components/clients/ClientTable';
 import Pagination from '../components/Pagination';
+import PermissionLegend from '../components/PermissionLegend';
 import CreateClientModal from '../components/modals/CreateClientModal';
 import DeleteClientModal from '../components/modals/DeleteClientModal';
+import AssignClientModal from '../components/modals/AssignClientModal';
 import { fetchClients, deleteClient } from '../services/clientService';
 import EditClientModal from '../components/modals/EditClientModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -37,7 +39,8 @@ const StatCard = ({ icon: Icon, label, value }) => (
 const ClientList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [clients, setClients] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
     const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || '');
     const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || 'all');
@@ -46,22 +49,29 @@ const ClientList = () => {
     const [showCreate, setShowCreate] = useState(false);
     const [editing, setEditing] = useState(null);
     const [deleting, setDeleting] = useState(null);
+    const [assigning, setAssigning] = useState(null);
 
-    const loadClients = async (page = currentPage) => {
+    // Dual loading states: initial shows full spinner, search shows inline indicator
+    // This keeps search input focused and prevents UI flash during typing
+    const loadClients = async (page = currentPage, search = debouncedSearch, isSearch = false) => {
         try {
-            setLoading(true);
-            const response = await fetchClients({ page, limit: 20 });
+            if (isSearch) setIsSearching(true);
+            else setIsInitialLoading(true);
+            
+            const response = await fetchClients({ page, limit: 20, search });
             if (response?.success) {
                 setClients(response.data);
                 setPagination(response.pagination);
             }
         } catch (err) {
             toast.error(err.message || 'Failed to load clients');
-        } finally { setLoading(false); }
+        } finally { 
+            if (isSearch) setIsSearching(false);
+            else setIsInitialLoading(false);
+        }
     };
 
-    useEffect(() => { loadClients(); }, []);
-
+    // Debounce search input
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
         return () => clearTimeout(timer);
@@ -81,10 +91,15 @@ const ClientList = () => {
         setCurrentPage(1);
     }, [debouncedSearch, selectedStatus]);
 
-    // Reload when page changes
+    // Reload when page changes (not a search operation)
     useEffect(() => {
-        loadClients(currentPage);
+        loadClients(currentPage, debouncedSearch, false);
     }, [currentPage]);
+
+    // Search when debounced search changes (is a search operation)
+    useEffect(() => {
+        loadClients(1, debouncedSearch, true);
+    }, [debouncedSearch]);
 
     const stats = useMemo(() => {
         const totalBudget = clients.reduce((sum, c) => sum + (c.stats?.budget || 0), 0);
@@ -98,15 +113,12 @@ const ClientList = () => {
         return { total: pagination?.totalCount || clients.length, budget: formatCurrency(totalBudget), influencers: totalInfluencers, active: activeCount };
     }, [clients, pagination]);
 
+    // Status filter is still client-side since backend doesn't filter by status
     const filtered = useMemo(() => {
         let result = clients;
         if (selectedStatus !== 'all') result = result.filter(c => c.status === selectedStatus);
-        if (debouncedSearch) {
-            const search = debouncedSearch.toLowerCase();
-            result = result.filter(c => c.name?.toLowerCase().includes(search) || c.campaign?.toLowerCase().includes(search));
-        }
         return result;
-    }, [clients, debouncedSearch, selectedStatus]);
+    }, [clients, selectedStatus]);
 
     const handleDelete = async () => {
         if (!deleting) return;
@@ -124,7 +136,7 @@ const ClientList = () => {
         }
     };
 
-    if (loading) {
+    if (isInitialLoading) {
         return <LoadingSpinner inline message="Loading clients..." />;
     }
 
@@ -186,10 +198,21 @@ const ClientList = () => {
                 </div>
             </div>
 
+            {/* Permission Legend */}
+            <PermissionLegend />
+
+            {/* Search loading indicator */}
+            {isSearching && (
+                <div className="flex items-center gap-2 text-sm text-base-content/50 mb-4 px-4 py-2 bg-base-100 rounded-lg border border-base-content/10">
+                    <FiLoader className="animate-spin" size={16} />
+                    Searching...
+                </div>
+            )}
+
             {/* Table */}
             {clients.length > 0 ? (
                 <>
-                    <ClientTable data={clients} onEdit={setEditing} onDelete={setDeleting} />
+                    <ClientTable data={clients} onEdit={setEditing} onDelete={setDeleting} onAssign={setAssigning} />
                     {pagination && (
                         <Pagination
                             currentPage={pagination.currentPage}
@@ -211,6 +234,13 @@ const ClientList = () => {
             {showCreate && <CreateClientModal onClose={() => setShowCreate(false)} refresh={loadClients} />}
             {editing && <EditClientModal client={editing} onClose={() => setEditing(null)} refresh={loadClients} />}
             {deleting && <DeleteClientModal client={deleting} onClose={() => setDeleting(null)} refresh={loadClients} />}
+            {assigning && (
+                <AssignClientModal
+                    client={assigning}
+                    onClose={() => setAssigning(null)}
+                    onSuccess={loadClients}
+                />
+            )}
         </div>
     );
 };

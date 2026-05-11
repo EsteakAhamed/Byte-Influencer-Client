@@ -9,11 +9,13 @@ import { FaInstagram, FaYoutube, FaFacebook, FaTiktok } from 'react-icons/fa';
 
 import InfluencerTable from '../components/influencers/InfluencerTable';
 import Pagination from '../components/Pagination';
+import PermissionLegend from '../components/PermissionLegend';
 import ImportInstagramModal from '../components/modals/ImportInstagramModal';
 import ImportYouTubeModal from '../components/modals/ImportYouTubeModal';
 import ImportFacebookModal from '../components/modals/ImportFacebookModal';
 import ImportTikTokModal from '../components/modals/ImportTikTokModal';
 import DeleteInfluencerModal from '../components/modals/DeleteInfluencerModal';
+import AssignInfluencerModal from '../components/modals/AssignInfluencerModal';
 import { fetchInfluencers, deleteInfluencer, deleteInfluencerPlatform } from '../services/influencerService';
 import EditInfluencerModal from '../components/modals/EditInfluencerModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -44,7 +46,8 @@ const StatCard = ({ icon: Icon, label, value, subtext }) => (
 const InfluencerList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [creators, setCreators] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || "");
     const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || "");
     const [selectedPlatform, setSelectedPlatform] = useState(searchParams.get('platform') || 'all');
@@ -57,21 +60,28 @@ const InfluencerList = () => {
     const [showTT, setShowTT] = useState(false);
     const [editing, setEditing] = useState(null);
     const [deleting, setDeleting] = useState(null);
+    const [assigning, setAssigning] = useState(null);
 
-    const loadCreators = async (page = currentPage) => {
+    // Dual loading states: initial shows full spinner, search shows inline indicator
+    // This keeps search input focused and prevents UI flash during typing
+    const loadCreators = async (page = currentPage, search = debouncedSearch, isSearch = false) => {
         try {
-            setLoading(true);
-            const response = await fetchInfluencers({ page, limit: 20 });
+            if (isSearch) setIsSearching(true);
+            else setIsInitialLoading(true);
+            
+            const response = await fetchInfluencers({ page, limit: 20, search });
             if (response?.success) {
                 setCreators(response.data);
                 setPagination(response.pagination);
             }
         } catch (err) { toast.error(err.message || "Failed to load influencers"); }
-        finally { setLoading(false); }
+        finally { 
+            if (isSearch) setIsSearching(false);
+            else setIsInitialLoading(false);
+        }
     };
 
-    useEffect(() => { loadCreators(); }, []);
-
+    // Debounce search input
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
         return () => clearTimeout(timer);
@@ -91,10 +101,15 @@ const InfluencerList = () => {
         setCurrentPage(1);
     }, [debouncedSearch, selectedPlatform]);
 
-    // Reload when page changes
+    // Reload when page changes (not a search operation)
     useEffect(() => {
-        loadCreators(currentPage);
+        loadCreators(currentPage, debouncedSearch, false);
     }, [currentPage]);
+
+    // Search when debounced search changes (is a search operation)
+    useEffect(() => {
+        loadCreators(1, debouncedSearch, true);
+    }, [debouncedSearch]);
 
     const stats = useMemo(() => {
         const totalFollowers = creators.reduce((sum, c) => sum + (c.followers || 0), 0);
@@ -110,15 +125,12 @@ const InfluencerList = () => {
         };
     }, [creators, pagination]);
 
+    // Platform filter is still client-side since backend doesn't filter by platform
     const filtered = useMemo(() => {
         let result = creators;
         if (selectedPlatform !== 'all') result = result.filter(c => c.platforms?.includes(selectedPlatform));
-        if (debouncedSearch) {
-            const search = debouncedSearch.toLowerCase();
-            result = result.filter(c => c.name?.toLowerCase().includes(search) || c.handle?.toLowerCase().includes(search));
-        }
         return result;
-    }, [creators, debouncedSearch, selectedPlatform]);
+    }, [creators, selectedPlatform]);
 
     const handleDeleteProfile = async (id) => {
         const prev = [...creators];
@@ -149,7 +161,7 @@ const InfluencerList = () => {
         } catch (err) { setCreators(prev); toast.error(err.message || "Platform removal failed"); }
     };
 
-    if (loading) {
+    if (isInitialLoading) {
         return <LoadingSpinner inline message="Loading creators..." />;
     }
 
@@ -222,10 +234,21 @@ const InfluencerList = () => {
                 </div>
             </div>
 
+            {/* Permission Legend */}
+            <PermissionLegend />
+
+            {/* Search loading indicator */}
+            {isSearching && (
+                <div className="flex items-center gap-2 text-sm text-base-content/50 mb-4 px-4 py-2 bg-base-100 rounded-lg border border-base-content/10">
+                    <FiLoader className="animate-spin" size={16} />
+                    Searching...
+                </div>
+            )}
+
             {/* Table */}
             {creators.length > 0 ? (
                 <>
-                    <InfluencerTable data={creators} onDelete={(id) => setDeleting(creators.find(c => c._id === id))} onEdit={setEditing} />
+                    <InfluencerTable data={creators} onDelete={(id) => setDeleting(creators.find(c => c._id === id))} onEdit={setEditing} onAssign={setAssigning} />
                     {pagination && (
                         <Pagination
                             currentPage={pagination.currentPage}
@@ -255,6 +278,13 @@ const InfluencerList = () => {
                     onClose={() => setDeleting(null)}
                     onDeleteProfile={handleDeleteProfile}
                     onDeletePlatform={handleDeletePlatform}
+                />
+            )}
+            {assigning && (
+                <AssignInfluencerModal
+                    influencer={assigning}
+                    onClose={() => setAssigning(null)}
+                    onSuccess={loadCreators}
                 />
             )}
         </div>

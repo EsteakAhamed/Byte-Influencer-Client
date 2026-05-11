@@ -19,10 +19,10 @@ const getAuthHeader = () => {
 // Get paginated list of influencers (filtered by user server-side)
 export const fetchInfluencers = async (params = {}) => {
     try {
-        const { page = 1, limit = 20 } = params;
+        const { page = 1, limit = 20, search = '' } = params;
         const res = await axios.get(`${API}/influencers`, { 
             headers: getAuthHeader(),
-            params: { page, limit }
+            params: { page, limit, search }
         });
         return res.data;
     } catch (error) {

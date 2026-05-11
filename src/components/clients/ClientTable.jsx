@@ -1,6 +1,6 @@
 import ClientRow from './ClientRow';
 
-const ClientTable = ({ data, onEdit, onDelete }) => {
+const ClientTable = ({ data, onEdit, onDelete, onAssign }) => {
     return (
         <div className="bg-base-100 rounded-xl border border-base-content/10 overflow-hidden">
             <table className="w-full">
@@ -20,6 +20,7 @@ const ClientTable = ({ data, onEdit, onDelete }) => {
                             client={client}
                             onEdit={onEdit}
                             onDelete={onDelete}
+                            onAssign={onAssign}
                         />
                     ))}
                 </tbody>

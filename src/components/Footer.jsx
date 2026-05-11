@@ -105,12 +105,10 @@ const Footer = () => {
                     <div className="col-span-2">
                         <Link
                             to="/"
-                            className="flex items-center gap-2 text-2xl font-black tracking-tighter mb-6"
+                            className="flex items-center text-2xl font-black tracking-tighter mb-6"
                         >
-                            <span>
-                                <span className="text-black">Byte</span>
-                                <span className="text-emerald-500 font-medium">Influencer</span>
-                            </span>
+                            <span className="text-base-content">Byte</span>
+                            <span className="text-emerald-500 font-medium">Influencer</span>
                         </Link>
                         <p className="text-base-content/50 text-sm leading-relaxed mb-8 max-w-xs">
                             Empowering the next generation of digital marketing through data-driven creator partnerships and seamless campaign management.
@@ -158,7 +156,7 @@ const Footer = () => {
                         <span>© {new Date().getFullYear()} Dragon Digitals </span>
                         <span className="w-1 h-1 rounded-full bg-base-content/20" />
                         <span className="flex items-center gap-1">
-                            MADE WITH <span className="text-red-500 text-base">♥</span> Md. Esteak Ahamed
+                            MADE BY <span className="text-red-500 text-base">♥</span> Md. Esteak Ahamed
                         </span>
                     </div>
 
